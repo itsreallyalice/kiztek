@@ -3,7 +3,6 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
-import org.scilab.forge.jlatexmath.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -20,14 +19,21 @@ public class Main extends JFrame {
 
     public Main () {
         setTitle("KiZTeK: The best LaTeX compiler!");
-
         ImageIcon logo = new ImageIcon(getClass().getResource("images/logo.png"));
         setIconImage(logo.getImage());
-
-
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setLocationRelativeTo(null);
+
+        JToolBar toolbar = new JToolBar();
+        JButton newButton = new JButton("New");
+        JButton uploadButton = new JButton("Upload");
+        JButton exportButton = new JButton("Export");
+        JButton directoryButton = new JButton("Directory");
+        toolbar.add(newButton);
+        toolbar.add(uploadButton);
+        toolbar.add(exportButton);
+        toolbar.add(directoryButton);
 
         JTextArea textField = new JTextArea();
         JButton submitButton = new JButton("Refresh");
@@ -37,16 +43,18 @@ public class Main extends JFrame {
         JScrollPane textScrollPane = new JScrollPane(textField);
         JScrollPane pdfScrollPane = new JScrollPane(pdfPanel);
         pdfScrollPane.getVerticalScrollBar().setUnitIncrement(20);
-        JPanel topPanel = new JPanel(new GridLayout(1, 2));
+        JPanel topPanel = new JPanel(new FlowLayout());
+        JPanel centerPanel = new JPanel(new GridLayout(1, 2));
         JPanel bottomPanel = new JPanel(new FlowLayout());
 
-
-        topPanel.add(textScrollPane);
-        topPanel.add(pdfScrollPane);
+        //topPanel.add(toolbar);
+        centerPanel.add(textScrollPane);
+        centerPanel.add(pdfScrollPane);
         bottomPanel.add(submitButton);
 
         setLayout(new BorderLayout());
-        add(topPanel, BorderLayout.CENTER);
+        add(toolbar, BorderLayout.NORTH);
+        add(centerPanel, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
 
         submitButton.addActionListener(new ActionListener() {
@@ -153,20 +161,6 @@ public class Main extends JFrame {
 
         return combinedImage;
     }
-
-    private BufferedImage generateLatexImage(String latexExpression) {
-        TeXFormula formula = new TeXFormula(latexExpression);
-        TeXIcon icon = formula.createTeXIcon(TeXConstants.STYLE_DISPLAY, 20);
-        BufferedImage image = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2 = image.createGraphics();
-        g2.setColor(Color.white);
-        g2.fillRect(0, 0, image.getWidth(), image.getHeight());
-        icon.paintIcon(null, g2, 0, 0);
-        g2.dispose();
-        return image;
-    }
-
-
 
     public static void main(String[] args) {
         new Main();
