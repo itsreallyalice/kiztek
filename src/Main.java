@@ -3,7 +3,6 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
-import org.scilab.forge.jlatexmath.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -17,37 +16,72 @@ public class Main extends JFrame {
     private JTextArea textField;
     private JButton submitButton;
     private JPanel pdfPanel;
+    private JPanel sidebar; // Added sidebar panel
+    private boolean isSidebarVisible = true; // Track sidebar visibility
 
     public Main () {
         setTitle("KiZTeK: The best LaTeX compiler!");
-
         ImageIcon logo = new ImageIcon(getClass().getResource("images/logo.png"));
         setIconImage(logo.getImage());
-
-
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setLocationRelativeTo(null);
 
+        JToolBar toolbar = new JToolBar();
+        JButton newButton = new JButton("New");
+        JButton uploadButton = new JButton("Open");
+        JButton exportButton = new JButton("Export");
+
+
+        // Define action listener for the toggle button
+        JButton toggleSidebarButton = new JButton("Toggle Sidebar");
+        toggleSidebarButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (isSidebarVisible) {
+                    sidebar.setVisible(false);
+                    isSidebarVisible = false;
+                    toggleSidebarButton.setText("Show Sidebar");
+                } else {
+                    sidebar.setVisible(true);
+                    isSidebarVisible = true;
+                    toggleSidebarButton.setText("Hide Sidebar");
+                }
+            }
+        });
+        toolbar.add(toggleSidebarButton);
+
+
+        toolbar.add(newButton);
+        toolbar.add(uploadButton);
+        toolbar.add(exportButton);
+
+
         JTextArea textField = new JTextArea();
         JButton submitButton = new JButton("Refresh");
         pdfPanel = new JPanel();
+        sidebar = new JPanel(); // Initialize the sidebar panel
+        sidebar.setPreferredSize(new Dimension(200, 0)); // Set preferred size of sidebar
+
 
         // Wrap the text area and PDF panel in JScrollPane
         JScrollPane textScrollPane = new JScrollPane(textField);
         JScrollPane pdfScrollPane = new JScrollPane(pdfPanel);
         pdfScrollPane.getVerticalScrollBar().setUnitIncrement(20);
-        JPanel topPanel = new JPanel(new GridLayout(1, 2));
+        JPanel topPanel = new JPanel(new FlowLayout());
+        JPanel centerPanel = new JPanel(new GridLayout(1, 2));
         JPanel bottomPanel = new JPanel(new FlowLayout());
 
-
-        topPanel.add(textScrollPane);
-        topPanel.add(pdfScrollPane);
+        //topPanel.add(toolbar);
+        centerPanel.add(textScrollPane);
+        centerPanel.add(pdfScrollPane);
         bottomPanel.add(submitButton);
 
         setLayout(new BorderLayout());
-        add(topPanel, BorderLayout.CENTER);
+        add(toolbar, BorderLayout.NORTH);
+        add(centerPanel, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
+        add(sidebar, BorderLayout.WEST); // Add sidebar to the west
 
         submitButton.addActionListener(new ActionListener() {
             @Override
@@ -57,8 +91,23 @@ public class Main extends JFrame {
                 JOptionPane.showMessageDialog( Main.this, "Refreshed!");
             }
         });
+
+
+        // Display files in the current directory
+        File currentDir = new File(".");
+        String[] files = currentDir.list();
+        JList<String> fileList = new JList<>(files);
+        sidebar.add(new JScrollPane(fileList), BorderLayout.CENTER);
+
+
         setVisible(true);
+
+
+
+
     }
+
+
 
     private void compileAndShowPdf(String latexDocument) {
         try {
@@ -93,17 +142,21 @@ public class Main extends JFrame {
             int exitCode = process.exitValue();
             if (exitCode == 0) {
                 // Show the PDF using an external PDF viewer (e.g., Adobe Acrobat Reader)
-                Path pdfPath = FileSystems.getDefault().getPath(tempFile.getParent(), tempFile.getName().replace(".tex", ".pdf"));
-                Desktop.getDesktop().open(pdfPath.toFile());
+                //Path pdfPath = FileSystems.getDefault().getPath(tempFile.getParent(), tempFile.getName().replace(".tex", ".pdf"));
+                //Desktop.getDesktop().open(pdfPath.toFile());
             } else {
                 System.err.println("Compilation failed with exit code: " + exitCode);
             }
             File pdfFile = new File(tempFile.getParent(), tempFile.getName().replace(".tex", ".pdf"));
+            currentPdfFile = pdfFile;
             displayPdf(pdfFile);
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
     }
+    private float scaleFactor = 1.5f; // Initial scale factor
+    private File currentPdfFile;
+
     private void displayPdf(File pdfFile) {
         try (PDDocument document = Loader.loadPDF(pdfFile)) {
             int pageCount = document.getNumberOfPages();
@@ -114,19 +167,21 @@ public class Main extends JFrame {
             float pageWidth = firstPage.getMediaBox().getWidth();
             float pageHeight = firstPage.getMediaBox().getHeight();
 
-            float scaleFactor = 3f;  // Adjust this value to make the PDF smaller
+            // Adjust the image size based on the scale factor
+            int scaledWidth = (int) (pageWidth * scaleFactor);
+            int scaledHeight = (int) (pageHeight * scaleFactor);
 
             // Combine pages into a single image
             BufferedImage combinedImage = new BufferedImage(
-                    (int) (pageWidth * scaleFactor),
-                    (int) (pageHeight * pageCount * scaleFactor),
+                    scaledWidth,
+                    scaledHeight * pageCount,
                     BufferedImage.TYPE_INT_ARGB
             );
 
             Graphics g = combinedImage.getGraphics();
             for (int pageIndex = 0; pageIndex < pageCount; pageIndex++) {
-                BufferedImage pageImage = pdfRenderer.renderImageWithDPI(pageIndex, 300, ImageType.RGB);
-                combinedImage = combineImagesHorizontally(combinedImage, pageImage);
+                BufferedImage pageImage = pdfRenderer.renderImageWithDPI(pageIndex, 300 * scaleFactor, ImageType.RGB);
+                g.drawImage(pageImage, 0, pageIndex * scaledHeight, scaledWidth, scaledHeight, null);
             }
 
             // Display the combined image in the pdfPanel
@@ -141,6 +196,20 @@ public class Main extends JFrame {
         }
     }
 
+    // Zoom in by increasing the scale factor
+    private void zoomIn() {
+        scaleFactor += 0.1f; // You can adjust the zoom level
+        displayPdf(currentPdfFile);
+    }
+
+    // Zoom out by decreasing the scale factor
+    private void zoomOut() {
+        scaleFactor -= 0.1f; // You can adjust the zoom level
+        if (scaleFactor < 0.1f) scaleFactor = 0.1f; // Limit minimum scale
+        displayPdf(currentPdfFile);
+    }
+
+
     private BufferedImage combineImagesHorizontally(BufferedImage image1, BufferedImage image2) {
         int combinedWidth = image1.getWidth() + image2.getWidth();
         int combinedHeight = Math.max(image1.getHeight(), image2.getHeight());
@@ -153,20 +222,6 @@ public class Main extends JFrame {
 
         return combinedImage;
     }
-
-    private BufferedImage generateLatexImage(String latexExpression) {
-        TeXFormula formula = new TeXFormula(latexExpression);
-        TeXIcon icon = formula.createTeXIcon(TeXConstants.STYLE_DISPLAY, 20);
-        BufferedImage image = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2 = image.createGraphics();
-        g2.setColor(Color.white);
-        g2.fillRect(0, 0, image.getWidth(), image.getHeight());
-        icon.paintIcon(null, g2, 0, 0);
-        g2.dispose();
-        return image;
-    }
-
-
 
     public static void main(String[] args) {
         new Main();
