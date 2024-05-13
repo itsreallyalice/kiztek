@@ -26,5 +26,6 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="icepdf-core-4.3.3" level="project" />
   </component>
 </module>

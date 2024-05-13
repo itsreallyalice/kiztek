@@ -11,6 +11,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import org.apache.pdfbox.debugger.ui.ZoomMenu;
 
 public class Main extends JFrame {
     private JTextArea textField;
@@ -98,6 +99,11 @@ public class Main extends JFrame {
         String[] files = currentDir.list();
         JList<String> fileList = new JList<>(files);
         sidebar.add(new JScrollPane(fileList), BorderLayout.CENTER);
+
+        ZoomMenu zoom;
+        
+
+        setVisible(true);
 
 
         setVisible(true);
