@@ -1,0 +1,19 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+description 'pdf to tiff image example'
+
+mainClassName = "org.icepdf.examples.capture.MultipleCapture"
+applicationDefaultJvmArgs = ["-Xms64m", "-Xmx1024m"]
+
+repositories {
+    mavenCentral()
+    maven { url "https://repository.jboss.org/nexus/content/repositories/thirdparty-releases/" }
+}
+
+dependencies {
+    implementation project(':core:core-awt'), project(':viewer:viewer-awt')
+    implementation group: 'javax.media', name: 'jai-core', version: '1.1.3'
+}

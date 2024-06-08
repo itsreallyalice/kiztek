@@ -1,0 +1,13 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+dependencies {
+    implementation project(':core:core-awt'), project(':viewer:viewer-awt')
+}
+
+description 'pdf to png image with watermark example'
+
+mainClassName = "org.icepdf.examples.capture.WatermarkPageCapture"
+applicationDefaultJvmArgs = ["-Xms64m", "-Xmx1024m"]
