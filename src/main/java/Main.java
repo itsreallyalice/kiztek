@@ -5,6 +5,8 @@ import javax.swing.undo.UndoManager;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.FileSystems;
@@ -22,7 +24,9 @@ public class Main extends JFrame implements ActionListener {
     private boolean isSidebarVisible = true; // Track sidebar visibility
     UndoManager undoManager = new UndoManager();
 
-    public Main () {
+    File lastOpenedFile = new File(FileManager.getLastOpenedFilePath());
+
+    public Main () throws IOException {
         setTitle("KiZTeK: The best LaTeX compiler!");
         ImageIcon logo = new ImageIcon(getClass().getResource("logo.png"));
         setIconImage(logo.getImage());
@@ -38,7 +42,7 @@ public class Main extends JFrame implements ActionListener {
 
     }
 
-    private void initUI() {
+    private void initUI() throws IOException {
 
         pdfPanel = new JPanel();
 
@@ -146,6 +150,19 @@ public class Main extends JFrame implements ActionListener {
 
 
         textField = new JTextArea();
+
+
+        if (FileManager.getLastOpenedFilePath() != null) {
+            lastOpenedFile = new File(FileManager.getLastOpenedFilePath());
+
+            if (lastOpenedFile.exists()) {
+
+                String content = FileManager.readFileToString(lastOpenedFile);
+                textField.setText(content);
+            }
+        }
+
+
         textField.getDocument().addUndoableEditListener(
                 new UndoableEditListener() {
                     @Override
@@ -154,6 +171,11 @@ public class Main extends JFrame implements ActionListener {
                     }
                 }
         );
+
+
+
+
+
         JButton submitButton = new JButton("Refresh");
 
 //        pdfPanel.setLayout(new FlowLayout());
@@ -203,7 +225,15 @@ public class Main extends JFrame implements ActionListener {
 
 
 
-        setVisible(true);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                super.windowClosing(e);
+                if (lastOpenedFile != null) {
+                    FileManager.saveLastOpenedFilePath(lastOpenedFile.getAbsolutePath());
+                }
+            }
+        });
 
 
         setVisible(true);
@@ -211,7 +241,7 @@ public class Main extends JFrame implements ActionListener {
     }
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
         new Main();
     }
@@ -234,5 +264,45 @@ public class Main extends JFrame implements ActionListener {
         else if (s.equals("Redo")){
             undoManager.redo();
         }
+        else if (s.equals("Save")){
+            try {
+                FileWriter fileWriter = new FileWriter(lastOpenedFile, false);
+                fileWriter.write(textField.getText());
+                fileWriter.close();
+            } catch (IOException z) {
+                z.printStackTrace();
+        }
+        }
+        else if (s.equals("Save as")) {
+            JFileChooser fileChooser = new JFileChooser();
+            if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+                File file = fileChooser.getSelectedFile();
+                lastOpenedFile = file;
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+                    textField.write(writer);
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(this, "Error saving file: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }
+        else if (s.equals("Open"))  {
+            JFileChooser fileChooser = new JFileChooser();
+            if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+                lastOpenedFile = fileChooser.getSelectedFile();
+                try {
+                    String content = FileManager.readFileToString(lastOpenedFile);
+                    textField.setText(content);
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(this, "Error opening file: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }
+        else if (s.equals("New")) {
+
+        }
+
+    }
+    public void windowClosing(WindowEvent e){
+
     }
 }
