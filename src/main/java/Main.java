@@ -1,4 +1,6 @@
 import javax.swing.*;
+import javax.swing.event.UndoableEditEvent;
+import javax.swing.event.UndoableEditListener;
 import javax.swing.undo.UndoManager;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -144,6 +146,14 @@ public class Main extends JFrame implements ActionListener {
 
 
         textField = new JTextArea();
+        textField.getDocument().addUndoableEditListener(
+                new UndoableEditListener() {
+                    @Override
+                    public void undoableEditHappened(UndoableEditEvent e) {
+                        undoManager.addEdit(e.getEdit());
+                    }
+                }
+        );
         JButton submitButton = new JButton("Refresh");
 
 //        pdfPanel.setLayout(new FlowLayout());
@@ -217,6 +227,12 @@ public class Main extends JFrame implements ActionListener {
         }
         else if (s.equals("Paste")){
             textField.paste();
+        }
+        else if (s.equals("Undo")){
+            undoManager.undo();
+        }
+        else if (s.equals("Redo")){
+            undoManager.redo();
         }
     }
 }
