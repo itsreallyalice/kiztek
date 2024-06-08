@@ -57,12 +57,15 @@ public class Main extends JFrame implements ActionListener {
         JMenuItem newMI = new JMenuItem("New");
         JMenuItem openMI = new JMenuItem("Open");
         JMenuItem saveMI = new JMenuItem("Save");
+        JMenuItem saveAsMI = new JMenuItem("Save As");
         newMI.addActionListener(this);
         openMI.addActionListener(this);
         saveMI.addActionListener(this);
+        saveAsMI.addActionListener(this);
         fileMenu.add(newMI);
         fileMenu.add(openMI);
         fileMenu.add(saveMI);
+        fileMenu.add(saveAsMI);
 
 
 
@@ -95,9 +98,11 @@ public class Main extends JFrame implements ActionListener {
         JButton undoButton = new JButton("Undo");
         JButton redoButton = new JButton("Redo");
         JButton saveButton = new JButton("Save");
+        JButton saveAsButton = new JButton("Save As");
         undoButton.addActionListener(this);
         redoButton.addActionListener(this);
         saveButton.addActionListener(this);
+        saveAsButton.addActionListener(this);
 
 
         // build a controller
@@ -151,6 +156,7 @@ public class Main extends JFrame implements ActionListener {
         toolbar.add(undoButton);
         toolbar.add(redoButton);
         toolbar.add(saveButton);
+        toolbar.add(saveAsButton);
 
 
         textField = new RSyntaxTextArea();
@@ -278,7 +284,7 @@ public class Main extends JFrame implements ActionListener {
                 z.printStackTrace();
         }
         }
-        else if (s.equals("Save as")) {
+        else if (s.equals("Save As")) {
             JFileChooser fileChooser = new JFileChooser();
             if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
@@ -305,9 +311,6 @@ public class Main extends JFrame implements ActionListener {
         else if (s.equals("New")) {
 
         }
-
-    }
-    public void windowClosing(WindowEvent e){
 
     }
 }
