@@ -11,13 +11,17 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
+
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.icepdf.ri.common.ComponentKeyBinding;
 import org.icepdf.ri.common.CustomViewBuilder;
 import org.icepdf.ri.common.SwingController;
 import org.icepdf.ri.common.SwingViewBuilder;
 
 public class Main extends JFrame implements ActionListener {
-    private JTextArea textField;
+    private RSyntaxTextArea textField;
+
     private JButton submitButton;
     private JPanel pdfPanel;
     private JPanel sidebar; // Added sidebar panel
@@ -149,8 +153,9 @@ public class Main extends JFrame implements ActionListener {
         toolbar.add(saveButton);
 
 
-        textField = new JTextArea();
-
+        textField = new RSyntaxTextArea();
+        textField.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_LATEX);
+        textField.setCodeFoldingEnabled(true);
 
         if (FileManager.getLastOpenedFilePath() != null) {
             lastOpenedFile = new File(FileManager.getLastOpenedFilePath());
