@@ -5,6 +5,8 @@
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$USER_HOME$/Downloads/icepdf-custom/pom.xml" />
+        <option value="$PROJECT_DIR$/icepdf-custom/pom.xml" />
       </list>
     </option>
   </component>

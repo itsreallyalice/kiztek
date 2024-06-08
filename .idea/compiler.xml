@@ -6,8 +6,64 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="signature-verification" />
+        <module name="metadata-extraction" />
+        <module name="watermark-capture" />
         <module name="kiztek 0.1" />
+        <module name="annotation-callback" />
+        <module name="png-capture" />
+        <module name="folder-capture" />
+        <module name="portfolio-capture" />
+        <module name="component-awt" />
+        <module name="loading-events" />
+        <module name="barecode-extraction" />
+        <module name="image-extraction" />
+        <module name="annotation-creation" />
+        <module name="text-extraction" />
+        <module name="icepdf-viewer" />
+        <module name="search-headless" />
+        <module name="search-component" />
+        <module name="tiff-capture" />
+        <module name="icepdf-core" />
+        <module name="print-services" />
+        <module name="javafx" />
+        <module name="svg-capture" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel target="11" />
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="annotation" options="-encoding iso-8859-1" />
+      <module name="annotation-callback" options="-encoding iso-8859-1" />
+      <module name="annotation-creation" options="-encoding iso-8859-1" />
+      <module name="barecode-extraction" options="-encoding iso-8859-1" />
+      <module name="capture" options="-encoding iso-8859-1" />
+      <module name="component-awt" options="-encoding iso-8859-1" />
+      <module name="core" options="-encoding iso-8859-1" />
+      <module name="examples" options="-encoding iso-8859-1" />
+      <module name="extraction" options="-encoding iso-8859-1" />
+      <module name="folder-capture" options="-encoding iso-8859-1" />
+      <module name="icepdf" options="-encoding iso-8859-1" />
+      <module name="icepdf-core" options="-encoding iso-8859-1" />
+      <module name="icepdf-viewer" options="-encoding iso-8859-1" />
+      <module name="image-extraction" options="-encoding iso-8859-1" />
+      <module name="javafx" options="-encoding iso-8859-1" />
+      <module name="loading-events" options="-encoding iso-8859-1" />
+      <module name="metadata-extraction" options="-encoding iso-8859-1" />
+      <module name="png-capture" options="-encoding iso-8859-1" />
+      <module name="portfolio-capture" options="-encoding iso-8859-1" />
+      <module name="print-services" options="-encoding iso-8859-1" />
+      <module name="redaction" options="-encoding iso-8859-1" />
+      <module name="search" options="-encoding iso-8859-1" />
+      <module name="search-component" options="-encoding iso-8859-1" />
+      <module name="search-headless" options="-encoding iso-8859-1" />
+      <module name="signature-verification" options="-encoding iso-8859-1" />
+      <module name="svg-capture" options="-encoding iso-8859-1" />
+      <module name="text-extraction" options="-encoding iso-8859-1" />
+      <module name="tiff-capture" options="-encoding iso-8859-1" />
+      <module name="viewer" options="-encoding iso-8859-1" />
+      <module name="watermark-capture" options="-encoding iso-8859-1" />
+    </option>
   </component>
 </project>
