@@ -193,7 +193,7 @@ public class Main extends JFrame implements ActionListener {
 //        pdfPanel.setSize(2500, 3500);
 
         sidebar = new JPanel(); // Initialize the sidebar panel
-        sidebar.setPreferredSize(new Dimension(200, 0)); // Set preferred size of sidebar
+        //sidebar.setPreferredSize(new Dimension(200, 0)); // Set preferred size of sidebar
 
 
         // Wrap the text area and PDF panel in JScrollPane
@@ -214,12 +214,15 @@ public class Main extends JFrame implements ActionListener {
         add(toolbar, BorderLayout.NORTH);
         add(centerPanel, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
+
+
         add(sidebar, BorderLayout.WEST); // Add sidebar to the west
 
         submitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                //Save whatever is inside textfield
+                //Main tex file is compiled instead of text box#
                 String latexExpression = textField.getText();
                 controller.openDocument(PDFCompiler.compile(latexExpression).getPath());
                 JOptionPane.showMessageDialog( Main.this, "Refreshed!");
@@ -227,10 +230,32 @@ public class Main extends JFrame implements ActionListener {
         });
 
 
-        // Display files in the current directory
-        File currentDir = new File(".");
+        // SIDEBAR CONGIF
+        JToolBar sideToolbar = new JToolBar();
+
+
+        JButton newFolderButton = new JButton("New Folder");
+        JButton newFileButton = new JButton("New File");
+        JButton uploadButton = new JButton("Upload");
+        JButton changeDirectoryButton = new JButton("Change Directory");
+
+        newFolderButton.addActionListener(this);
+        newFileButton.addActionListener(this);
+        uploadButton.addActionListener(this);
+        changeDirectoryButton.addActionListener(this);
+
+        sideToolbar.add(newFolderButton);
+        sideToolbar.add(newFileButton);
+        sideToolbar.add(uploadButton);
+        sideToolbar.add(changeDirectoryButton);
+
+
+        File currentDir = new File(lastOpenedFile.getParent());
         String[] files = currentDir.list();
         JList<String> fileList = new JList<>(files);
+
+        sidebar.setLayout(new BorderLayout());
+        sidebar.add(sideToolbar, BorderLayout.NORTH);
         sidebar.add(new JScrollPane(fileList), BorderLayout.CENTER);
 
 

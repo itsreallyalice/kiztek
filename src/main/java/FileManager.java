@@ -5,6 +5,7 @@ import java.util.ResourceBundle;
 public class FileManager {
     private static final String PROPERTIES_FILE_BASE_NAME = "config";
     private static final String LAST_OPENED_FILE_KEY = "lastOpenedFile";
+    private static final String MAIN_TEX_FILE_KEY = "mainTexFile";
     private static ResourceBundle resourceBundle = ResourceBundle.getBundle(PROPERTIES_FILE_BASE_NAME);
 
 
@@ -24,6 +25,9 @@ public class FileManager {
             }
         }
         return content.toString();
+    }
+    public static void getCurrentDir() {
+
     }
     public static void saveLastOpenedFilePath(String path) {
         Properties properties = new Properties();
