@@ -11,7 +11,7 @@ public class FileManager {
 
 
 
-
+    public static String getMainTexFile() {return resourceBundle.getString(MAIN_TEX_FILE_KEY);}
     public static String getLastOpenedFilePath() {
         return resourceBundle.getString(LAST_OPENED_FILE_KEY);
     }
@@ -26,7 +26,24 @@ public class FileManager {
         }
         return content.toString();
     }
-    public static void getCurrentDir() {
+    public static void setMainTexFile(String path) {
+        Properties properties = new Properties();
+        // Load existing properties
+        try (InputStream input = FileManager.class.getClassLoader().getResourceAsStream(PROPERTIES_FILE_BASE_NAME + ".properties")) {
+            if (input != null) {
+                properties.load(input);
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        // Set the new property
+        properties.setProperty(MAIN_TEX_FILE_KEY, path);
+        // Save properties back to the file
+        try (OutputStream output = new FileOutputStream(new File(FileManager.class.getClassLoader().getResource(PROPERTIES_FILE_BASE_NAME + ".properties").toURI()))) {
+            properties.store(output, null);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
 
     }
     public static void saveLastOpenedFilePath(String path) {

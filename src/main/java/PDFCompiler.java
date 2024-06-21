@@ -2,14 +2,14 @@ import java.io.*;
 import java.nio.file.Files;
 
 public class PDFCompiler {
-    public static File compile(String latexDocument) {
+    public static File compile(File latexDocument) {
         try {
             File tempFile = File.createTempFile("tempLatex", ".tex");
             tempFile.deleteOnExit();
-            Files.write(tempFile.toPath(), latexDocument.getBytes());
+//            Files.write(tempFile.toPath(), latexDocument.getBytes());
 
-            ProcessBuilder processBuilder = new ProcessBuilder("pdflatex", "-output-directory=" + tempFile.getParent(), tempFile.getName())
-                    .directory(tempFile.getParentFile());
+            ProcessBuilder processBuilder = new ProcessBuilder("pdflatex", "-output-directory=" + tempFile.getParent(), latexDocument.getName())
+                    .directory(latexDocument.getParentFile());
             processBuilder.redirectErrorStream(true);
             Process process = processBuilder.start();
 
@@ -26,7 +26,8 @@ public class PDFCompiler {
             process.waitFor();
             int exitCode = process.exitValue();
             if (exitCode == 0) {
-                File pdfFile = new File(tempFile.getParent(), tempFile.getName().replace(".tex", ".pdf"));
+
+                File pdfFile = new File(tempFile.getParent(), latexDocument.getName().replace(".tex", ".pdf"));
                 return pdfFile;
             } else {
                 System.err.println("Compilation failed with exit code: " + exitCode);
