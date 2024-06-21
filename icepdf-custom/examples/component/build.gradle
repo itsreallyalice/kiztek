@@ -1,0 +1,13 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+dependencies {
+    implementation project(':core:core-awt'), project(':viewer:viewer-awt')
+}
+
+description 'viewer component example'
+
+mainClassName = "org.icepdf.examples.component.ViewerComponentExample"
+applicationDefaultJvmArgs = ["-Xms64m", "-Xmx1024m"]

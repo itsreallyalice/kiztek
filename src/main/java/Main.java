@@ -1,26 +1,36 @@
 import javax.swing.*;
+import javax.swing.event.UndoableEditEvent;
+import javax.swing.event.UndoableEditListener;
 import javax.swing.undo.UndoManager;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
+
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.icepdf.ri.common.ComponentKeyBinding;
 import org.icepdf.ri.common.CustomViewBuilder;
 import org.icepdf.ri.common.SwingController;
 import org.icepdf.ri.common.SwingViewBuilder;
 
 public class Main extends JFrame implements ActionListener {
-    private JTextArea textField;
+    private RSyntaxTextArea textField;
+
     private JButton submitButton;
     private JPanel pdfPanel;
     private JPanel sidebar; // Added sidebar panel
     private boolean isSidebarVisible = true; // Track sidebar visibility
     UndoManager undoManager = new UndoManager();
 
-    public Main () {
+    File lastOpenedFile = new File(FileManager.getLastOpenedFilePath());
+
+    public Main () throws IOException {
         setTitle("KiZTeK: The best LaTeX compiler!");
         ImageIcon logo = new ImageIcon(getClass().getResource("logo.png"));
         setIconImage(logo.getImage());
@@ -36,7 +46,7 @@ public class Main extends JFrame implements ActionListener {
 
     }
 
-    private void initUI() {
+    private void initUI() throws IOException {
 
         pdfPanel = new JPanel();
 
@@ -47,12 +57,15 @@ public class Main extends JFrame implements ActionListener {
         JMenuItem newMI = new JMenuItem("New");
         JMenuItem openMI = new JMenuItem("Open");
         JMenuItem saveMI = new JMenuItem("Save");
+        JMenuItem saveAsMI = new JMenuItem("Save As");
         newMI.addActionListener(this);
         openMI.addActionListener(this);
         saveMI.addActionListener(this);
+        saveAsMI.addActionListener(this);
         fileMenu.add(newMI);
         fileMenu.add(openMI);
         fileMenu.add(saveMI);
+        fileMenu.add(saveAsMI);
 
 
 
@@ -85,9 +98,11 @@ public class Main extends JFrame implements ActionListener {
         JButton undoButton = new JButton("Undo");
         JButton redoButton = new JButton("Redo");
         JButton saveButton = new JButton("Save");
+        JButton saveAsButton = new JButton("Save As");
         undoButton.addActionListener(this);
         redoButton.addActionListener(this);
         saveButton.addActionListener(this);
+        saveAsButton.addActionListener(this);
 
 
         // build a controller
@@ -141,16 +156,44 @@ public class Main extends JFrame implements ActionListener {
         toolbar.add(undoButton);
         toolbar.add(redoButton);
         toolbar.add(saveButton);
+        toolbar.add(saveAsButton);
 
 
-        textField = new JTextArea();
+        textField = new RSyntaxTextArea();
+        textField.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_LATEX);
+        textField.setCodeFoldingEnabled(true);
+
+        if (FileManager.getLastOpenedFilePath() != null) {
+            lastOpenedFile = new File(FileManager.getLastOpenedFilePath());
+
+            if (lastOpenedFile.exists()) {
+
+                String content = FileManager.readFileToString(lastOpenedFile);
+                textField.setText(content);
+            }
+        }
+
+
+        textField.getDocument().addUndoableEditListener(
+                new UndoableEditListener() {
+                    @Override
+                    public void undoableEditHappened(UndoableEditEvent e) {
+                        undoManager.addEdit(e.getEdit());
+                    }
+                }
+        );
+
+
+
+
+
         JButton submitButton = new JButton("Refresh");
 
 //        pdfPanel.setLayout(new FlowLayout());
 //        pdfPanel.setSize(2500, 3500);
 
         sidebar = new JPanel(); // Initialize the sidebar panel
-        sidebar.setPreferredSize(new Dimension(200, 0)); // Set preferred size of sidebar
+        //sidebar.setPreferredSize(new Dimension(200, 0)); // Set preferred size of sidebar
 
 
         // Wrap the text area and PDF panel in JScrollPane
@@ -171,12 +214,15 @@ public class Main extends JFrame implements ActionListener {
         add(toolbar, BorderLayout.NORTH);
         add(centerPanel, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
+
+
         add(sidebar, BorderLayout.WEST); // Add sidebar to the west
 
         submitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                //Save whatever is inside textfield
+                //Main tex file is compiled instead of text box#
                 String latexExpression = textField.getText();
                 controller.openDocument(PDFCompiler.compile(latexExpression).getPath());
                 JOptionPane.showMessageDialog( Main.this, "Refreshed!");
@@ -184,16 +230,46 @@ public class Main extends JFrame implements ActionListener {
         });
 
 
-        // Display files in the current directory
-        File currentDir = new File(".");
+        // SIDEBAR CONGIF
+        JToolBar sideToolbar = new JToolBar();
+
+
+        JButton newFolderButton = new JButton("New Folder");
+        JButton newFileButton = new JButton("New File");
+        JButton uploadButton = new JButton("Upload");
+        JButton changeDirectoryButton = new JButton("Change Directory");
+
+        newFolderButton.addActionListener(this);
+        newFileButton.addActionListener(this);
+        uploadButton.addActionListener(this);
+        changeDirectoryButton.addActionListener(this);
+
+        sideToolbar.add(newFolderButton);
+        sideToolbar.add(newFileButton);
+        sideToolbar.add(uploadButton);
+        sideToolbar.add(changeDirectoryButton);
+
+
+        File currentDir = new File(lastOpenedFile.getParent());
         String[] files = currentDir.list();
         JList<String> fileList = new JList<>(files);
+
+        sidebar.setLayout(new BorderLayout());
+        sidebar.add(sideToolbar, BorderLayout.NORTH);
         sidebar.add(new JScrollPane(fileList), BorderLayout.CENTER);
 
 
 
 
-        setVisible(true);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                super.windowClosing(e);
+                if (lastOpenedFile != null) {
+                    FileManager.saveLastOpenedFilePath(lastOpenedFile.getAbsolutePath());
+                }
+            }
+        });
 
 
         setVisible(true);
@@ -201,7 +277,7 @@ public class Main extends JFrame implements ActionListener {
     }
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
         new Main();
     }
@@ -218,5 +294,48 @@ public class Main extends JFrame implements ActionListener {
         else if (s.equals("Paste")){
             textField.paste();
         }
+        else if (s.equals("Undo")){
+            undoManager.undo();
+        }
+        else if (s.equals("Redo")){
+            undoManager.redo();
+        }
+        else if (s.equals("Save")){
+            try {
+                FileWriter fileWriter = new FileWriter(lastOpenedFile, false);
+                fileWriter.write(textField.getText());
+                fileWriter.close();
+            } catch (IOException z) {
+                z.printStackTrace();
+        }
+        }
+        else if (s.equals("Save As")) {
+            JFileChooser fileChooser = new JFileChooser();
+            if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+                File file = fileChooser.getSelectedFile();
+                lastOpenedFile = file;
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+                    textField.write(writer);
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(this, "Error saving file: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }
+        else if (s.equals("Open"))  {
+            JFileChooser fileChooser = new JFileChooser();
+            if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+                lastOpenedFile = fileChooser.getSelectedFile();
+                try {
+                    String content = FileManager.readFileToString(lastOpenedFile);
+                    textField.setText(content);
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(this, "Error opening file: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }
+        else if (s.equals("New")) {
+
+        }
+
     }
 }

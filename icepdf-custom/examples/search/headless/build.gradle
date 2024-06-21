@@ -1,0 +1,13 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+dependencies {
+    implementation project(':core:core-awt'), project(':viewer:viewer-awt')
+}
+
+description 'headless search highlight example'
+
+mainClassName = "org.icepdf.examples.search.SearchControllerHeadless"
+applicationDefaultJvmArgs = ["-Xms64m", "-Xmx1024m"]

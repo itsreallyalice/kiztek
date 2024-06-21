@@ -16,22 +16,101 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.github.pcorless.icepdf</groupId>
-            <artifactId>icepdf-core</artifactId>
-            <version>7.2.0</version>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>3.13.0</version>
         </dependency>
-        <dependency>
-            <groupId>com.github.pcorless.icepdf</groupId>
-            <artifactId>icepdf-viewer</artifactId>
-            <version>7.2.0</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.github.pcorless.icepdf</groupId>-->
+<!--            <artifactId>icepdf-core</artifactId>-->
+<!--            <version>7.2.0</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>com.github.pcorless.icepdf</groupId>-->
+<!--            <artifactId>icepdf-viewer</artifactId>-->
+<!--            <version>7.2.0</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>com.github.pcorless.icepdf</groupId>
             <artifactId>icepdf-viewer</artifactId>
             <version>7.3.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.fifesoft</groupId>
+            <artifactId>rsyntaxtextarea</artifactId>
+            <version>3.4.0</version>
+        </dependency>
     </dependencies>
+                <build>
+                    <plugins>
+                        <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-dependency-plugin</artifactId>
+                            <version>3.6.1</version>
+                            <executions>
+                                <execution>
+                                    <id>unpack-dependencies</id>
+                                    <phase>package</phase>
+                                    <goals>
+                                        <goal>unpack-dependencies</goal>
+                                    </goals>
+                                    <configuration>
+                                        <excludeScope>system</excludeScope>
+                                        <excludes>META-INF/*.SF</excludes>
+                                        <excludes>META-INF/*.DSA</excludes>
+                                        <excludes>META-INF/*.RSA</excludes>
+                                        <excludeGroupIds>junit,org.mockito,org.hamcrest</excludeGroupIds>
+                                        <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                                    </configuration>
+                                </execution>
+                            </executions>
+
+
+                        </plugin>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-jar-plugin</artifactId>
+                            <version>3.4.1</version>
+                            <configuration>
+                                <archive>
+                                    <manifest>
+                                        <addClasspath>true</addClasspath>
+                                        <mainClass>Main</mainClass>
+                                    </manifest>
+                                </archive>
+                            </configuration>
+
+                        </plugin>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-shade-plugin</artifactId>
+                            <version>3.6.0</version>
+                            <executions>
+                                <execution>
+                                    <phase>package</phase>
+                                    <goals>
+                                        <goal>shade</goal>
+                                    </goals>
+                                    <configuration>
+                                        <filters>
+                                            <filter>
+                                                <!-- filter out signature files from signed dependencies, else repackaging fails with security ex -->
+                                                <artifact>*:*</artifact>
+                                                <excludes>
+                                                    <exclude>META-INF/*.SF</exclude>
+                                                    <exclude>META-INF/*.DSA</exclude>
+                                                    <exclude>META-INF/*.RSA</exclude>
+                                                </excludes>
+                                            </filter>
+                                        </filters>
+                                    </configuration>
+                                </execution>
+                            </executions>
+                        </plugin>
+    </plugins>
+
+    </build>
 
 
 </project>

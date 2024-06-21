@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.github.pcorless.icepdf</groupId>
+        <artifactId>icepdf</artifactId>
+        <version>7.3.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>viewer</artifactId>
+    <packaging>pom</packaging>
+    <name>ICEpdf :: Viewer</name>
+    <description>
+        The ICEpdf common viewer reference library.
+    </description>
+
+    <modules>
+        <!--<module>viewer-core</module>-->
+        <module>viewer-awt</module>
+        <!--<module>viewer-fx</module>-->
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.github.pcorless.icepdf</groupId>
+                <artifactId>icepdf-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit.bom.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+</project>
