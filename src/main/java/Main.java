@@ -24,6 +24,7 @@ public class Main extends JFrame implements ActionListener {
     private JButton submitButton;
     private JPanel pdfPanel;
     private JPanel sidebar; // Added sidebar panel
+    JList<String> fileList = new JList<>();
     private boolean isSidebarVisible = true; // Track sidebar visibility
     UndoManager undoManager = new UndoManager();
 
@@ -128,7 +129,7 @@ public class Main extends JFrame implements ActionListener {
 
         File currentDir = new File(lastOpenedFile.getParent());
         String[] files = currentDir.list();
-        JList<String> fileList = new JList<>(files);
+        fileList = new JList<>(files);
 
         // Add list selection listener
         fileList.addListSelectionListener(new ListSelectionListener() {
@@ -138,7 +139,7 @@ public class Main extends JFrame implements ActionListener {
                 if (!e.getValueIsAdjusting()) {
                     String selectedFile = fileList.getSelectedValue();
                     if (selectedFile != null) {
-                        File tempFile = new File(currentDir.getAbsolutePath(), selectedFile);
+                        File tempFile = new File(lastOpenedFile.getParent(), selectedFile);
                         try {
                             tempContent = FileManager.readFileToString(tempFile);
                         } catch (IOException ex) {
@@ -349,12 +350,17 @@ public class Main extends JFrame implements ActionListener {
 
 
             if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+
                 mainTeXFile = fileChooser.getSelectedFile();
                 lastOpenedFile = fileChooser.getSelectedFile();
+
 
                 FileManager.setMainTexFile(mainTeXFile.getAbsolutePath());
                 FileManager.saveLastOpenedFilePath(lastOpenedFile.getAbsolutePath());
                 //refresh sidebar
+                File currentDir = new File(lastOpenedFile.getParent());
+                String[] files = currentDir.list();
+                fileList.setListData(files);
 
                 try {
 
