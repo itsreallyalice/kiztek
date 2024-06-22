@@ -29,7 +29,7 @@ public class Main extends JFrame implements ActionListener {
     UndoManager undoManager = new UndoManager();
 
     File lastOpenedFile = new File(FileManager.getLastOpenedFilePath());
-    File mainTeXFile;
+    File mainTeXFile = new File(FileManager.getMainTexFile());
 
     public Main () throws IOException {
         setTitle("KiZTeK: The best LaTeX compiler!");
@@ -138,8 +138,10 @@ public class Main extends JFrame implements ActionListener {
                 String tempContent = new String();
                 if (!e.getValueIsAdjusting()) {
                     String selectedFile = fileList.getSelectedValue();
+
                     if (selectedFile != null) {
                         File tempFile = new File(lastOpenedFile.getParent(), selectedFile);
+                        lastOpenedFile = tempFile;
                         try {
                             tempContent = FileManager.readFileToString(tempFile);
                         } catch (IOException ex) {
@@ -274,7 +276,7 @@ public class Main extends JFrame implements ActionListener {
                 //Save whatever is inside textfield
                 //Main tex file is compiled instead of text box#
                 String latexExpression = textField.getText();
-                controller.openDocument(PDFCompiler.compile(lastOpenedFile).getPath());
+                controller.openDocument(PDFCompiler.compile(mainTeXFile).getPath());
                 JOptionPane.showMessageDialog( Main.this, "Refreshed!");
             }
         });
@@ -328,6 +330,7 @@ public class Main extends JFrame implements ActionListener {
                 FileWriter fileWriter = new FileWriter(lastOpenedFile, false);
                 fileWriter.write(textField.getText());
                 fileWriter.close();
+                System.out.println(lastOpenedFile.getName() + "saved!");
             } catch (IOException z) {
                 z.printStackTrace();
         }
