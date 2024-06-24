@@ -1,3 +1,5 @@
+import org.apache.commons.io.FilenameUtils;
+
 import java.io.*;
 import java.nio.file.Files;
 
@@ -24,7 +26,8 @@ public class PDFCompiler {
             System.out.println("latex[1] exited with code: " + latex1ExitCode);
 
             //CHANGE SO NO .TEX EXTENSION
-            ProcessBuilder bibtexProcessBuilder = new ProcessBuilder("bibtex", latexDocument.getName()).directory(latexDocument.getParentFile());
+            String latexName =  FilenameUtils.removeExtension(latexDocument.getName());
+            ProcessBuilder bibtexProcessBuilder = new ProcessBuilder("bibtex", latexName).directory(latexDocument.getParentFile());
             bibtexProcessBuilder.redirectErrorStream(true);
             Process bibtexProcess = bibtexProcessBuilder.start();
             try (InputStream inputStream = bibtexProcess.getInputStream();
