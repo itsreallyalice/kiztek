@@ -1,3 +1,4 @@
+import javax.swing.*;
 import java.io.*;
 import java.util.Properties;
 import java.util.ResourceBundle;
@@ -65,4 +66,29 @@ public class FileManager {
             ex.printStackTrace();
         }
     }
+    public static File createNewFile(String baseName, String path) throws IOException {
+        File file = new File(path, baseName);
+        int counter = 1;
+
+        // Extract the filename without extension and the extension itself
+        String fileNameWithoutExtension = baseName.substring(0, baseName.lastIndexOf('.'));
+        String extension = baseName.substring(baseName.lastIndexOf('.'));
+
+
+
+        // Loop to find a unique file name
+        while (file.exists()) {
+            file = new File(path,fileNameWithoutExtension + "-" + counter + extension);
+            counter++;
+        }
+
+        // Create the new file
+
+        if (file.createNewFile()) {
+            return file;
+        } else {
+            throw new IOException("Failed to create new file.");
+        }
+    }
+
 }

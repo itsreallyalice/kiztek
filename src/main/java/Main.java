@@ -12,7 +12,9 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
@@ -111,20 +113,20 @@ public class Main extends JFrame implements ActionListener {
         JToolBar sideToolbar = new JToolBar();
 
 
-        JButton newFolderButton = new JButton("New Folder");
+//        JButton newFolderButton = new JButton("New Folder");
         JButton newFileButton = new JButton("New File");
         JButton uploadButton = new JButton("Upload");
-        JButton changeDirectoryButton = new JButton("Change Directory");
 
-        newFolderButton.addActionListener(this);
+
+       // newFolderButton.addActionListener(this);
         newFileButton.addActionListener(this);
         uploadButton.addActionListener(this);
-        changeDirectoryButton.addActionListener(this);
 
-        sideToolbar.add(newFolderButton);
+
+     //   sideToolbar.add(newFolderButton);
         sideToolbar.add(newFileButton);
         sideToolbar.add(uploadButton);
-        sideToolbar.add(changeDirectoryButton);
+
 
 
         File currentDir = new File(lastOpenedFile.getParent());
@@ -275,8 +277,13 @@ public class Main extends JFrame implements ActionListener {
             public void actionPerformed(ActionEvent e) {
                 //Save whatever is inside textfield
                 //Main tex file is compiled instead of text box#
-                String latexExpression = textField.getText();
+                try {
+                    saveFile();
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
                 controller.openDocument(PDFCompiler.compile(mainTeXFile).getPath());
+                refreshSidebar();
                 JOptionPane.showMessageDialog( Main.this, "Refreshed!");
             }
         });
@@ -327,13 +334,18 @@ public class Main extends JFrame implements ActionListener {
         }
         else if (s.equals("Save")){
             try {
-                FileWriter fileWriter = new FileWriter(lastOpenedFile, false);
-                fileWriter.write(textField.getText());
-                fileWriter.close();
-                System.out.println(lastOpenedFile.getName() + "saved!");
-            } catch (IOException z) {
-                z.printStackTrace();
-        }
+                saveFile();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+//            try {
+//                FileWriter fileWriter = new FileWriter(lastOpenedFile, false);
+//                fileWriter.write(textField.getText());
+//                fileWriter.close();
+//                System.out.println(lastOpenedFile.getName() + "saved!");
+//            } catch (IOException z) {
+//                z.printStackTrace();
+//        }
         }
         else if (s.equals("Save As")) {
             JFileChooser fileChooser = new JFileChooser();
@@ -346,6 +358,7 @@ public class Main extends JFrame implements ActionListener {
                     JOptionPane.showMessageDialog(this, "Error saving file: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
+            refreshSidebar();
         }
         //OPEN MAIN TEX FILE
         else if (s.equals("Open"))  {
@@ -361,9 +374,10 @@ public class Main extends JFrame implements ActionListener {
                 FileManager.setMainTexFile(mainTeXFile.getAbsolutePath());
                 FileManager.saveLastOpenedFilePath(lastOpenedFile.getAbsolutePath());
                 //refresh sidebar
-                File currentDir = new File(lastOpenedFile.getParent());
-                String[] files = currentDir.list();
-                fileList.setListData(files);
+                refreshSidebar();
+//                File currentDir = new File(lastOpenedFile.getParent());
+//                String[] files = currentDir.list();
+//                fileList.setListData(files);
 
                 try {
 
@@ -376,8 +390,69 @@ public class Main extends JFrame implements ActionListener {
             }
         }
         else if (s.equals("New")) {
+            //Are you sure?/choose directory
+            //Name it (name of folder)
+            // Then set everything to blank
+        }
+        else if (s.equals("New File")) {
+            File newFile;
+            String baseFilename = JOptionPane.showInputDialog(null,"New File","untitled.tex");
+            try {
+
+                newFile = FileManager.createNewFile(baseFilename,lastOpenedFile.getParent());
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+            textField.setText("");
+            refreshSidebar();
+        }
+//        else if (s.equals("New Folder")) {
+//
+//        }
+        else if (s.equals("Upload")) {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
+                @Override
+                public boolean accept(File f) {
+                    if (f.isDirectory()) {
+                        return true;
+                    } else {
+                        String filename = f.getName().toLowerCase();
+                        return filename.endsWith(".jpg") || filename.endsWith(".jpeg") || filename.endsWith(".png") || filename.endsWith(".gif");
+                    }
+                }
+
+                @Override
+                public String getDescription() {
+                    return "Image Files (*.jpg, *.jpeg, *.png, *.gif)";
+                }
+            });
+
+            int result = fileChooser.showOpenDialog(null);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                File selectedFile = fileChooser.getSelectedFile();
+                File newFile = new File(lastOpenedFile.getParent(), selectedFile.getName());
+                try {
+                    Files.copy(selectedFile.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+                refreshSidebar();
+                JOptionPane.showMessageDialog(null, "Image uploaded: " + selectedFile.getAbsolutePath());
+            }
 
         }
 
+    }
+    private void refreshSidebar() {
+        File currentDir = new File(lastOpenedFile.getParent());
+        String[] files = currentDir.list();
+        fileList.setListData(files);
+    }
+    private void saveFile() throws IOException {
+        FileWriter fileWriter = new FileWriter(lastOpenedFile, false);
+        fileWriter.write(textField.getText());
+        fileWriter.close();
+        System.out.println(lastOpenedFile.getName() + "saved!");
     }
 }
