@@ -1,4 +1,6 @@
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
 import javax.swing.undo.UndoManager;
@@ -10,14 +12,13 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
-import org.icepdf.ri.common.ComponentKeyBinding;
-import org.icepdf.ri.common.CustomViewBuilder;
-import org.icepdf.ri.common.SwingController;
-import org.icepdf.ri.common.SwingViewBuilder;
+import org.icepdf.ri.common.*;
 
 public class Main extends JFrame implements ActionListener {
     private RSyntaxTextArea textField;
@@ -25,10 +26,12 @@ public class Main extends JFrame implements ActionListener {
     private JButton submitButton;
     private JPanel pdfPanel;
     private JPanel sidebar; // Added sidebar panel
+    JList<String> fileList = new JList<>();
     private boolean isSidebarVisible = true; // Track sidebar visibility
     UndoManager undoManager = new UndoManager();
 
     File lastOpenedFile = new File(FileManager.getLastOpenedFilePath());
+    File mainTeXFile = new File(FileManager.getMainTexFile());
 
     public Main () throws IOException {
         setTitle("KiZTeK: The best LaTeX compiler!");
@@ -105,6 +108,57 @@ public class Main extends JFrame implements ActionListener {
         saveAsButton.addActionListener(this);
 
 
+        // SIDEBAR CONGIF
+        sidebar = new JPanel(); // Initialize the sidebar panel
+        JToolBar sideToolbar = new JToolBar();
+
+
+//        JButton newFolderButton = new JButton("New Folder");
+        JButton newFileButton = new JButton("New File");
+        JButton uploadButton = new JButton("Upload");
+
+
+       // newFolderButton.addActionListener(this);
+        newFileButton.addActionListener(this);
+        uploadButton.addActionListener(this);
+
+
+     //   sideToolbar.add(newFolderButton);
+        sideToolbar.add(newFileButton);
+        sideToolbar.add(uploadButton);
+
+
+
+        File currentDir = new File(lastOpenedFile.getParent());
+        String[] files = currentDir.list();
+        fileList = new JList<>(files);
+
+        // Add list selection listener
+        fileList.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                String tempContent = new String();
+                if (!e.getValueIsAdjusting()) {
+                    String selectedFile = fileList.getSelectedValue();
+
+                    if (selectedFile != null) {
+                        File tempFile = new File(lastOpenedFile.getParent(), selectedFile);
+                        lastOpenedFile = tempFile;
+                        try {
+                            tempContent = FileManager.readFileToString(tempFile);
+                        } catch (IOException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                        textField.setText(tempContent);
+                    }
+                }
+            }
+        });
+        sidebar.setLayout(new BorderLayout());
+        sidebar.add(sideToolbar, BorderLayout.NORTH);
+        sidebar.add(new JScrollPane(fileList), BorderLayout.CENTER);
+
+
         // build a controller
         SwingController controller = new SwingController();
 
@@ -124,7 +178,7 @@ public class Main extends JFrame implements ActionListener {
 
         // add interactive mouse link annotation support via callback
         controller.getDocumentViewController().setAnnotationCallback(
-                new org.icepdf.ri.common.MyAnnotationCallback(
+                new MyAnnotationCallback(
                         controller.getDocumentViewController()));
 
         pdfPanel = viewerComponentPanel;
@@ -192,7 +246,7 @@ public class Main extends JFrame implements ActionListener {
 //        pdfPanel.setLayout(new FlowLayout());
 //        pdfPanel.setSize(2500, 3500);
 
-        sidebar = new JPanel(); // Initialize the sidebar panel
+
         //sidebar.setPreferredSize(new Dimension(200, 0)); // Set preferred size of sidebar
 
 
@@ -223,40 +277,18 @@ public class Main extends JFrame implements ActionListener {
             public void actionPerformed(ActionEvent e) {
                 //Save whatever is inside textfield
                 //Main tex file is compiled instead of text box#
-                String latexExpression = textField.getText();
-                controller.openDocument(PDFCompiler.compile(latexExpression).getPath());
+                try {
+                    saveFile();
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+                controller.openDocument(PDFCompiler.compile(mainTeXFile).getPath());
+                refreshSidebar();
                 JOptionPane.showMessageDialog( Main.this, "Refreshed!");
             }
         });
 
 
-        // SIDEBAR CONGIF
-        JToolBar sideToolbar = new JToolBar();
-
-
-        JButton newFolderButton = new JButton("New Folder");
-        JButton newFileButton = new JButton("New File");
-        JButton uploadButton = new JButton("Upload");
-        JButton changeDirectoryButton = new JButton("Change Directory");
-
-        newFolderButton.addActionListener(this);
-        newFileButton.addActionListener(this);
-        uploadButton.addActionListener(this);
-        changeDirectoryButton.addActionListener(this);
-
-        sideToolbar.add(newFolderButton);
-        sideToolbar.add(newFileButton);
-        sideToolbar.add(uploadButton);
-        sideToolbar.add(changeDirectoryButton);
-
-
-        File currentDir = new File(lastOpenedFile.getParent());
-        String[] files = currentDir.list();
-        JList<String> fileList = new JList<>(files);
-
-        sidebar.setLayout(new BorderLayout());
-        sidebar.add(sideToolbar, BorderLayout.NORTH);
-        sidebar.add(new JScrollPane(fileList), BorderLayout.CENTER);
 
 
 
@@ -302,12 +334,18 @@ public class Main extends JFrame implements ActionListener {
         }
         else if (s.equals("Save")){
             try {
-                FileWriter fileWriter = new FileWriter(lastOpenedFile, false);
-                fileWriter.write(textField.getText());
-                fileWriter.close();
-            } catch (IOException z) {
-                z.printStackTrace();
-        }
+                saveFile();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+//            try {
+//                FileWriter fileWriter = new FileWriter(lastOpenedFile, false);
+//                fileWriter.write(textField.getText());
+//                fileWriter.close();
+//                System.out.println(lastOpenedFile.getName() + "saved!");
+//            } catch (IOException z) {
+//                z.printStackTrace();
+//        }
         }
         else if (s.equals("Save As")) {
             JFileChooser fileChooser = new JFileChooser();
@@ -320,13 +358,31 @@ public class Main extends JFrame implements ActionListener {
                     JOptionPane.showMessageDialog(this, "Error saving file: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
+            refreshSidebar();
         }
+        //OPEN MAIN TEX FILE
         else if (s.equals("Open"))  {
             JFileChooser fileChooser = new JFileChooser();
+
+
             if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+
+                mainTeXFile = fileChooser.getSelectedFile();
                 lastOpenedFile = fileChooser.getSelectedFile();
+
+
+                FileManager.setMainTexFile(mainTeXFile.getAbsolutePath());
+                FileManager.saveLastOpenedFilePath(lastOpenedFile.getAbsolutePath());
+                //refresh sidebar
+                refreshSidebar();
+//                File currentDir = new File(lastOpenedFile.getParent());
+//                String[] files = currentDir.list();
+//                fileList.setListData(files);
+
                 try {
+
                     String content = FileManager.readFileToString(lastOpenedFile);
+
                     textField.setText(content);
                 } catch (IOException ex) {
                     JOptionPane.showMessageDialog(this, "Error opening file: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -334,8 +390,69 @@ public class Main extends JFrame implements ActionListener {
             }
         }
         else if (s.equals("New")) {
+            //Are you sure?/choose directory
+            //Name it (name of folder)
+            // Then set everything to blank
+        }
+        else if (s.equals("New File")) {
+            File newFile;
+            String baseFilename = JOptionPane.showInputDialog(null,"New File","untitled.tex");
+            try {
+
+                newFile = FileManager.createNewFile(baseFilename,lastOpenedFile.getParent());
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+            textField.setText("");
+            refreshSidebar();
+        }
+//        else if (s.equals("New Folder")) {
+//
+//        }
+        else if (s.equals("Upload")) {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
+                @Override
+                public boolean accept(File f) {
+                    if (f.isDirectory()) {
+                        return true;
+                    } else {
+                        String filename = f.getName().toLowerCase();
+                        return filename.endsWith(".jpg") || filename.endsWith(".jpeg") || filename.endsWith(".png") || filename.endsWith(".gif");
+                    }
+                }
+
+                @Override
+                public String getDescription() {
+                    return "Image Files (*.jpg, *.jpeg, *.png, *.gif)";
+                }
+            });
+
+            int result = fileChooser.showOpenDialog(null);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                File selectedFile = fileChooser.getSelectedFile();
+                File newFile = new File(lastOpenedFile.getParent(), selectedFile.getName());
+                try {
+                    Files.copy(selectedFile.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+                refreshSidebar();
+                JOptionPane.showMessageDialog(null, "Image uploaded: " + selectedFile.getAbsolutePath());
+            }
 
         }
 
+    }
+    private void refreshSidebar() {
+        File currentDir = new File(lastOpenedFile.getParent());
+        String[] files = currentDir.list();
+        fileList.setListData(files);
+    }
+    private void saveFile() throws IOException {
+        FileWriter fileWriter = new FileWriter(lastOpenedFile, false);
+        fileWriter.write(textField.getText());
+        fileWriter.close();
+        System.out.println(lastOpenedFile.getName() + "saved!");
     }
 }

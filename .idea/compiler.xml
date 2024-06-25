@@ -15,6 +15,7 @@
         <module name="folder-capture" />
         <module name="portfolio-capture" />
         <module name="component-awt" />
+        <module name="latex_compiler" />
         <module name="loading-events" />
         <module name="barecode-extraction" />
         <module name="image-extraction" />
