@@ -132,6 +132,11 @@ public class Main extends JFrame implements ActionListener {
         File currentDir = new File(lastOpenedFile.getParent());
         String[] files = currentDir.list();
         fileList = new JList<>(files);
+        if (files == null) {
+            DefaultListModel<String> listModel = new DefaultListModel<>();
+            fileList = new JList<>(listModel);
+        }
+
 
         // Add list selection listener
         fileList.addListSelectionListener(new ListSelectionListener() {

@@ -12,9 +12,20 @@ public class FileManager {
 
 
 
-    public static String getMainTexFile() {return resourceBundle.getString(MAIN_TEX_FILE_KEY);}
+    public static String getMainTexFile() {
+        if (resourceBundle.getString(MAIN_TEX_FILE_KEY) == null) {
+            return new JFileChooser().getFileSystemView().getDefaultDirectory().toString();
+        }
+        else{
+            return resourceBundle.getString(MAIN_TEX_FILE_KEY);}
+    }
     public static String getLastOpenedFilePath() {
-        return resourceBundle.getString(LAST_OPENED_FILE_KEY);
+        if (resourceBundle.getString(LAST_OPENED_FILE_KEY) == null) {
+            return new JFileChooser().getFileSystemView().getDefaultDirectory().toString();
+        }
+        else{
+            return resourceBundle.getString(LAST_OPENED_FILE_KEY);}
+
     }
 
     public static String readFileToString(File file) throws IOException {
