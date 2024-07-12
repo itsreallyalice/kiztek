@@ -1,16 +1,23 @@
 import org.apache.commons.io.FilenameUtils;
 
+import javax.xml.transform.ErrorListener;
+import javax.xml.transform.TransformerException;
 import java.io.*;
 import java.nio.file.Files;
 
 public class PDFCompiler {
-    public static File compile(File latexDocument) {
+
+    public static ErrorListener errorListener;
+    public void setErrorListener(ErrorListener errorListener) {
+        this.errorListener = errorListener;
+    }
+    public static File compile(File latexDocument) throws TransformerException {
         try {
             File tempFile = File.createTempFile("tempLatex", ".tex");
             tempFile.deleteOnExit();
 //            Files.write(tempFile.toPath(), latexDocument.getBytes());
 
-            ProcessBuilder latex1ProcessBuilder = new ProcessBuilder("pdflatex", latexDocument.getName()).directory(latexDocument.getParentFile());
+            ProcessBuilder latex1ProcessBuilder = new ProcessBuilder("pdflatex", "-interaction=nonstopmode", latexDocument.getName()).directory(latexDocument.getParentFile());
             latex1ProcessBuilder.redirectErrorStream(true);
             Process latex1Process = latex1ProcessBuilder.start();
             try (InputStream inputStream = latex1Process.getInputStream();
@@ -27,7 +34,7 @@ public class PDFCompiler {
 
             //CHANGE SO NO .TEX EXTENSION
             String latexName =  FilenameUtils.removeExtension(latexDocument.getName());
-            ProcessBuilder bibtexProcessBuilder = new ProcessBuilder("bibtex", latexName).directory(latexDocument.getParentFile());
+            ProcessBuilder bibtexProcessBuilder = new ProcessBuilder("bibtex", "-interaction=nonstopmode",latexName).directory(latexDocument.getParentFile());
             bibtexProcessBuilder.redirectErrorStream(true);
             Process bibtexProcess = bibtexProcessBuilder.start();
             try (InputStream inputStream = bibtexProcess.getInputStream();
@@ -42,7 +49,7 @@ public class PDFCompiler {
             int bibtexExitCode = bibtexProcess.waitFor();
             System.out.println("bibtex exited with code: " + bibtexExitCode);
 
-            ProcessBuilder latex2ProcessBuilder = new ProcessBuilder("pdflatex", latexDocument.getName()).directory(latexDocument.getParentFile());
+            ProcessBuilder latex2ProcessBuilder = new ProcessBuilder("pdflatex", "-interaction=nonstopmode",latexDocument.getName()).directory(latexDocument.getParentFile());
             latex2ProcessBuilder.redirectErrorStream(true);
             Process latex2Process = latex2ProcessBuilder.start();
             try (InputStream inputStream = latex2Process.getInputStream();
@@ -57,7 +64,7 @@ public class PDFCompiler {
             int latex2ExitCode = latex2Process.waitFor();
             System.out.println("latex[1] exited with code: " + latex2ExitCode);
 
-            ProcessBuilder processBuilder = new ProcessBuilder("pdflatex", "-output-directory=" + tempFile.getParent(), latexDocument.getName())
+            ProcessBuilder processBuilder = new ProcessBuilder("pdflatex", "-interaction=nonstopmode", "-output-directory=" + tempFile.getParent(), latexDocument.getName())
                     .directory(latexDocument.getParentFile());
             //run bibtex as well
             //run this on a different thread so no freezing.
@@ -84,7 +91,10 @@ public class PDFCompiler {
                 System.err.println("Compilation failed with exit code: " + exitCode);
             }
         } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+
+            if (errorListener != null) {
+                errorListener.error((TransformerException) e);
+            }
         }
         return null;
     }

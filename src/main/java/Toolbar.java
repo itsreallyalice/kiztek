@@ -1,12 +1,15 @@
 import javax.swing.*;
+import javax.xml.transform.TransformerException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 
-public class Toolbar extends JToolBar implements ActionListener {
+public class Toolbar extends JToolBar implements ActionListener   {
     private Main mainFrame;
     private File mainTeXFile;
+
+    private boolean isSidebarVisible = true;
 
     public Toolbar(Main mainFrame) {
         this.mainFrame = mainFrame;
@@ -37,6 +40,7 @@ public class Toolbar extends JToolBar implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         String command = e.getActionCommand();
         TextEditor textEditorPanel = mainFrame.getTextEditorPanel();
+        Sidebar sidebarPanel = mainFrame.getSidebarPanel();
         switch (command) {
             case "Undo":
                 textEditorPanel.getUndoManager().undo();
@@ -65,7 +69,16 @@ public class Toolbar extends JToolBar implements ActionListener {
 //                mainFrame.getSidebarPanel().refreshSidebar();
 //                break;
             case "Toggle Sidebar":
+                if (isSidebarVisible) {
+                    sidebarPanel.setVisible(false);
+                    isSidebarVisible = false;
 
+                } else {
+                    sidebarPanel.setVisible(true);
+                    isSidebarVisible = true;
+
+                }
+                break;
             case "Recompile":
                                 //Save whatever is inside textfield
                 //Main tex file is compiled instead of text box#
@@ -74,8 +87,13 @@ public class Toolbar extends JToolBar implements ActionListener {
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
-
-                mainFrame.getPdfViewerPanel().getController().openDocument(PDFCompiler.compile(new File(FileManager.getMainTexFile())).getPath());
+                PDFCompiler compiler = new PDFCompiler();
+                compiler.setErrorListener(mainFrame);
+                try {
+                    mainFrame.getPdfViewerPanel().getController().openDocument(PDFCompiler.compile(new File(FileManager.getMainTexFile())).getPath());
+                } catch (TransformerException ex) {
+                    throw new RuntimeException(ex);
+                }
 
                 mainFrame.getSidebarPanel().refreshSidebar();
                 JOptionPane.showMessageDialog( this, "Refreshed!");

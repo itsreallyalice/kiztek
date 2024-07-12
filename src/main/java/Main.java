@@ -5,6 +5,8 @@ import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
 import javax.swing.undo.UndoManager;
 import javax.tools.Tool;
+import javax.xml.transform.ErrorListener;
+import javax.xml.transform.TransformerException;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -21,7 +23,7 @@ import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.icepdf.ri.common.*;
 
-public class Main extends JFrame {
+public class Main extends JFrame implements ErrorListener {
     private TextEditor textEditorPanel;
     private PDFViewer pdfViewerPanel;
     private Toolbar toolbarPanel;
@@ -29,7 +31,7 @@ public class Main extends JFrame {
 
     private Menubar menubarPanel;
 
-    public Main () throws IOException {
+    public Main () throws IOException{
 
         setTitle("KiZTeK: The best LaTeX compiler!");
         ImageIcon logo = new ImageIcon(getClass().getResource("logo.png"));
@@ -47,10 +49,15 @@ public class Main extends JFrame {
         menubarPanel = new Menubar(this);
 
         setJMenuBar(menubarPanel);
+
         setLayout(new BorderLayout());
+        JPanel centerPanel = new JPanel(new GridLayout(1, 2));
+        centerPanel.add(textEditorPanel);
+        centerPanel.add(pdfViewerPanel);
+
+
         add(toolbarPanel, BorderLayout.NORTH);
-        add(textEditorPanel, BorderLayout.CENTER);
-        add(pdfViewerPanel, BorderLayout.EAST);
+        add(centerPanel, BorderLayout.CENTER);
         add(sidebarPanel, BorderLayout.WEST);
 
 
@@ -86,6 +93,21 @@ public class Main extends JFrame {
     public static void main(String[] args) throws IOException {
 
         new Main();
+    }
+
+    @Override
+    public void warning(TransformerException exception) throws TransformerException {
+
+    }
+
+    @Override
+    public void error(TransformerException exception) throws TransformerException {
+
+    }
+
+    @Override
+    public void fatalError(TransformerException exception) throws TransformerException {
+
     }
 }
 

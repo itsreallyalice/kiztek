@@ -7,25 +7,52 @@ public class FileManager {
     private static final String PROPERTIES_FILE_BASE_NAME = "config";
     private static final String LAST_OPENED_FILE_KEY = "lastOpenedFile";
     private static final String MAIN_TEX_FILE_KEY = "mainTexFile";
-    private static ResourceBundle resourceBundle = ResourceBundle.getBundle(PROPERTIES_FILE_BASE_NAME);
+
 
 
 
 
     public static String getMainTexFile() {
-        if (resourceBundle.getString(MAIN_TEX_FILE_KEY) == null) {
+        Properties properties = new Properties();
+        // Load existing properties
+        try (InputStream input = FileManager.class.getClassLoader().getResourceAsStream(PROPERTIES_FILE_BASE_NAME + ".properties")) {
+            if (input != null) {
+                properties.load(input);
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        if (properties.getProperty(MAIN_TEX_FILE_KEY) == null) {
             return new JFileChooser().getFileSystemView().getDefaultDirectory().toString();
         }
         else{
-            return resourceBundle.getString(MAIN_TEX_FILE_KEY);}
+            return properties.getProperty(MAIN_TEX_FILE_KEY);}
     }
-    public static String getLastOpenedFilePath() {
-        if (resourceBundle.getString(LAST_OPENED_FILE_KEY) == null) {
-            return new JFileChooser().getFileSystemView().getDefaultDirectory().toString();
+//    public static String getLastOpenedFilePath() {
+//        if (resourceBundle.getString(LAST_OPENED_FILE_KEY) == null) {
+//            return new JFileChooser().getFileSystemView().getDefaultDirectory().toString();
+//        }
+//        else{
+//            return resourceBundle.getString(LAST_OPENED_FILE_KEY);}
+//
+//    }
+
+    public  static File getLastOpenedFilePathNew() {
+        Properties properties = new Properties();
+        try (InputStream input = FileManager.class.getClassLoader().getResourceAsStream(PROPERTIES_FILE_BASE_NAME + ".properties")) {
+            if (input != null) {
+                properties.load(input);
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        if (properties.getProperty(LAST_OPENED_FILE_KEY) == null) {
+            File tempFile = new File(new JFileChooser().getFileSystemView().getDefaultDirectory().toString());
+            return new File(new JFileChooser().getFileSystemView().getDefaultDirectory().toString());
         }
         else{
-            return resourceBundle.getString(LAST_OPENED_FILE_KEY);}
-
+            return new File( properties.getProperty(LAST_OPENED_FILE_KEY));
+        }
     }
 
     public static String readFileToString(File file) throws IOException {
@@ -59,6 +86,7 @@ public class FileManager {
 
     }
     public static void saveLastOpenedFilePath(String path) {
+
         Properties properties = new Properties();
         // Load existing properties
         try (InputStream input = FileManager.class.getClassLoader().getResourceAsStream(PROPERTIES_FILE_BASE_NAME + ".properties")) {
@@ -69,6 +97,7 @@ public class FileManager {
             ex.printStackTrace();
         }
         // Set the new property
+        System.out.println(path);
         properties.setProperty(LAST_OPENED_FILE_KEY, path);
         // Save properties back to the file
         try (OutputStream output = new FileOutputStream(new File(FileManager.class.getClassLoader().getResource(PROPERTIES_FILE_BASE_NAME + ".properties").toURI()))) {
@@ -76,6 +105,7 @@ public class FileManager {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+        System.out.println("last opened file" + path);
     }
     public static File createNewFile(String baseName, String path) throws IOException {
         File file = new File(path, baseName);

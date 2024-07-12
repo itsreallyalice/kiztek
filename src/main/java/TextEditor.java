@@ -21,7 +21,7 @@ public class TextEditor extends JPanel {
         textArea.setCodeFoldingEnabled(true);
 
 
-        File tempFile = new File(FileManager.getLastOpenedFilePath());
+        File tempFile = FileManager.getLastOpenedFilePathNew();
         String content = FileManager.readFileToString(tempFile);
         textArea.setText(content);
 
@@ -45,9 +45,10 @@ public class TextEditor extends JPanel {
     }
 
     public void saveFile() throws IOException {
-        FileWriter fileWriter = new FileWriter(FileManager.getLastOpenedFilePath(), false);
+        File tempFile = FileManager.getLastOpenedFilePathNew();
+        FileWriter fileWriter = new FileWriter(tempFile, false);
         fileWriter.write(textArea.getText());
         fileWriter.close();
-        System.out.println(FileManager.getLastOpenedFilePath() + "saved!");
+        System.out.println(FileManager.getLastOpenedFilePathNew() + "saved!");
     }
 }
