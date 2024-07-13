@@ -16,15 +16,15 @@ public class Menubar extends JMenuBar implements ActionListener {
         JMenuItem newMI = new JMenuItem("New");
         JMenuItem openMI = new JMenuItem("Open");
         JMenuItem saveMI = new JMenuItem("Save");
-        JMenuItem saveAsMI = new JMenuItem("Save As");
+
         newMI.addActionListener(this);
         openMI.addActionListener(this);
         saveMI.addActionListener(this);
-        saveAsMI.addActionListener(this);
+
         fileMenu.add(newMI);
         fileMenu.add(openMI);
         fileMenu.add(saveMI);
-        fileMenu.add(saveAsMI);
+
 
         JMenu editMenu = new JMenu("Edit");
 
@@ -104,10 +104,7 @@ public class Menubar extends JMenuBar implements ActionListener {
                 if (newFileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
                     File dir = newFileChooser.getSelectedFile();
                     File file;
-
-
                     file = FileManager.createMainTeX("main.tex",dir.getAbsolutePath());
-
                     FileManager.saveLastOpenedFilePath(file.getAbsolutePath());
                     FileManager.setMainTexFile(file.getAbsolutePath());
                     try {

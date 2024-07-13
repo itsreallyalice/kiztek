@@ -1,3 +1,4 @@
+import org.fife.ui.rtextarea.RTextArea;
 import org.fife.ui.rtextarea.SearchContext;
 import org.fife.ui.rtextarea.SearchEngine;
 
@@ -23,10 +24,85 @@ public class Toolbar extends JToolBar implements ActionListener   {
 
         JButton toggleSidebarButton = new JButton("Toggle Sidebar");
         JButton reCompileButton = new JButton("Recompile");
-        JButton undoButton = new JButton("Undo");
-        JButton redoButton = new JButton("Redo");
+        JButton undoButton = new JButton(RTextArea.getAction(RTextArea.UNDO_ACTION));
+        JButton redoButton = new JButton(RTextArea.getAction(RTextArea.REDO_ACTION));
         JButton saveButton = new JButton("Save");
 
+        JButton sectionButton = new JButton("Section");
+
+        // Create the dropdown menu
+        JPopupMenu sectionMenu = new JPopupMenu();
+        JMenuItem sectionItem = new JMenuItem("Section");
+        JMenuItem subsectionItem = new JMenuItem("Subsection");
+        JMenuItem subsubsectionItem = new JMenuItem("Subsubsection");
+        JMenuItem paragraphItem = new JMenuItem("Paragraph");
+        JMenuItem subparagraphItem = new JMenuItem("Subparagraph");
+
+        JButton boldButton = new JButton("Bold");
+        JButton italicButton = new JButton("Italic");
+
+        JButton insertButton = new JButton("Insert");
+
+        // Create the dropdown menu
+        JPopupMenu insertMenu = new JPopupMenu();
+        JMenuItem inlineMathItem = new JMenuItem("Inline Math");
+        JMenuItem displayMathItem = new JMenuItem("Display Math");
+        JMenuItem linkItem = new JMenuItem("Link");
+        JMenuItem citationItem = new JMenuItem("Citation");
+        JMenuItem crossReferenceItem = new JMenuItem("Cross-Reference");
+        JMenuItem figureItem = new JMenuItem("Figure");
+        JMenuItem tableItem = new JMenuItem("Table");
+        JMenuItem listItem = new JMenuItem("List");
+
+
+        sectionMenu.add(sectionItem);
+        sectionMenu.add(subsectionItem);
+        sectionMenu.add(subsubsectionItem);
+        sectionMenu.add(paragraphItem);
+        sectionMenu.add(subparagraphItem);
+
+        insertMenu.add(inlineMathItem);
+        insertMenu.add(displayMathItem);
+        insertMenu.add(linkItem);
+        insertMenu.add(citationItem);
+        insertMenu.add(crossReferenceItem);
+        insertMenu.add(figureItem);
+        insertMenu.add(tableItem);
+        insertMenu.add(listItem);
+
+
+        // Add action listener to the button to show the dropdown menu
+        sectionButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sectionMenu.show(sectionButton, sectionButton.getWidth() / 2, sectionButton.getHeight() / 2);
+            }
+        });
+
+        insertButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                insertMenu.show(insertButton, insertButton.getWidth() / 2, insertButton.getHeight() / 2);
+            }
+        });
+
+        sectionItem.addActionListener(this);
+        subsectionItem.addActionListener(this);
+        subsubsectionItem.addActionListener(this);
+        paragraphItem.addActionListener(this);
+        subparagraphItem.addActionListener(this);
+
+        boldButton.addActionListener(this);
+        italicButton.addActionListener(this);
+
+        inlineMathItem.addActionListener(this);
+        displayMathItem.addActionListener(this);
+        linkItem.addActionListener(this);
+        citationItem.addActionListener(this);
+        crossReferenceItem.addActionListener(this);
+        figureItem.addActionListener(this);
+        tableItem.addActionListener(this);
+        listItem.addActionListener(this);
 
         toggleSidebarButton.addActionListener(this);
         reCompileButton.addActionListener(this);
@@ -64,6 +140,13 @@ public class Toolbar extends JToolBar implements ActionListener   {
         add(redoButton);
 
         addSeparator();
+
+        add(sectionButton);
+        add(boldButton);
+        add(italicButton);
+        add(insertButton);
+
+        addSeparator();
         //add(saveAsButton);
         add(Box.createGlue());
         add(reCompileButton);
@@ -78,12 +161,6 @@ public class Toolbar extends JToolBar implements ActionListener   {
         Sidebar sidebarPanel = mainFrame.getSidebarPanel();
 
         switch (command) {
-            case "Undo":
-                textEditorPanel.getUndoManager().undo();
-                break;
-            case "Redo":
-                textEditorPanel.getUndoManager().redo();
-                break;
             case "Save":
                 try {
                     textEditorPanel.saveFile();
@@ -121,6 +198,52 @@ public class Toolbar extends JToolBar implements ActionListener   {
 
                 mainFrame.getSidebarPanel().refreshSidebar();
                 JOptionPane.showMessageDialog( this, "Refreshed!");
+                break;
+            case "Section":
+                mainFrame.getTextEditorPanel().insertAtCursor(mainFrame.getTextEditorPanel().getTextArea(), "\\section{}");
+                break;
+            case "Subsection":
+                mainFrame.getTextEditorPanel().insertAtCursor(mainFrame.getTextEditorPanel().getTextArea(), "\\subsection{}");
+                break;
+            case "Subsubsection":
+                mainFrame.getTextEditorPanel().insertAtCursor(mainFrame.getTextEditorPanel().getTextArea(), "\\subsubsection{}");
+                break;
+            case "Paragraph":
+                mainFrame.getTextEditorPanel().insertAtCursor(mainFrame.getTextEditorPanel().getTextArea(), "\\paragraph{}");
+                break;
+            case "Subparagraph":
+                mainFrame.getTextEditorPanel().insertAtCursor(mainFrame.getTextEditorPanel().getTextArea(), "\\subparagraph{}");
+                break;
+            case "Bold":
+                mainFrame.getTextEditorPanel().insertAtCursor(mainFrame.getTextEditorPanel().getTextArea(), "\\textbf{}");
+                break;
+            case "Italic":
+                mainFrame.getTextEditorPanel().insertAtCursor(mainFrame.getTextEditorPanel().getTextArea(), "\\textit{}");
+                break;
+            case "Inline Math":
+                mainFrame.getTextEditorPanel().insertAtCursor(mainFrame.getTextEditorPanel().getTextArea(), "\\(\\)");
+                break;
+            case "Display Math":
+                mainFrame.getTextEditorPanel().insertAtCursor(mainFrame.getTextEditorPanel().getTextArea(), "\\[\\]");
+                break;
+            case "Link":
+                mainFrame.getTextEditorPanel().insertAtCursor(mainFrame.getTextEditorPanel().getTextArea(), "\\href{}{}");
+                break;
+            case "Citation":
+                mainFrame.getTextEditorPanel().insertAtCursor(mainFrame.getTextEditorPanel().getTextArea(), "\\cite{}");
+                break;
+            case "Cross-Reference":
+                mainFrame.getTextEditorPanel().insertAtCursor(mainFrame.getTextEditorPanel().getTextArea(), "\\ref{}");
+                break;
+            case "Figure":
+                mainFrame.getTextEditorPanel().insertAtCursor(mainFrame.getTextEditorPanel().getTextArea(), "\\begin{figure}\n\n" + "\\end{figure}\n\n");
+                break;
+            case "Table":
+                mainFrame.getTextEditorPanel().insertAtCursor(mainFrame.getTextEditorPanel().getTextArea(), "\\begin{table}\n\n" + "\\end{table}\n\n");
+                break;
+            case "List":
+                mainFrame.getTextEditorPanel().insertAtCursor(mainFrame.getTextEditorPanel().getTextArea(), "\\begin{itemize}\n\n" + "\\end{itemize}\n\n");
+                break;
         }
 
         // "FindNext" => search forward, "FindPrev" => search backward

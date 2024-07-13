@@ -51,4 +51,14 @@ public class TextEditor extends JPanel {
         fileWriter.close();
         System.out.println(FileManager.getLastOpenedFilePathNew() + "saved!");
     }
+
+    public void insertAtCursor(RSyntaxTextArea textField, String text) {
+        int pos = textField.getCaretPosition();
+        String currentText = textField.getText();
+        StringBuilder sb = new StringBuilder(currentText);
+        sb.insert(pos, text);
+        textField.setText(sb.toString());
+
+        textField.setCaretPosition(pos + text.length() - 1); // Place cursor inside the curly brackets
+    }
 }
