@@ -73,30 +73,36 @@ public class Sidebar extends JPanel implements ActionListener {
 
         switch (command) {
             case "New File":
-                String content = "\\documentclass{article}\n\n"
-                        + "\\begin{document}\n\n"
-                        + "(Type your content here.)\n\n"
-                        + "\\end{document}";
-
-                File newFile;
-                String baseFilename = JOptionPane.showInputDialog(null,"New File","untitled.tex");
-
-
+//                String content = "\\documentclass{article}\n\n"
+//                        + "\\begin{document}\n\n"
+//                        + "(Type your content here.)\n\n"
+//                        + "\\end{document}";
+//
+//                File newFile;
+//                String baseFilename = JOptionPane.showInputDialog(null,"New File","untitled.tex");
+//
+//
+//                try {
+//
+//                    newFile = FileManager.createNewFile(baseFilename,FileManager.getLastOpenedFilePathNew().getParent());
+//                } catch (IOException ex) {
+//                    throw new RuntimeException(ex);
+//                }
+//
+//                try (FileWriter fileWriter = new FileWriter(newFile)) {
+//                    fileWriter.write(content);
+//                    System.out.println("File created and content written successfully.");
+//                } catch (IOException e) {
+//                    System.out.println("An error occurred while creating/writing to the file.");
+//                    e.printStackTrace();
+//                }
+                File newFile = FileManager.createMainTeX("untitled.tex", FileManager.getLastOpenedFilePathNew().getParent());
+                String content = null;
                 try {
-
-                    newFile = FileManager.createNewFile(baseFilename,FileManager.getLastOpenedFilePathNew().getParent());
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                }
-
-                try (FileWriter fileWriter = new FileWriter(newFile)) {
-                    fileWriter.write(content);
-                    System.out.println("File created and content written successfully.");
+                    content = FileManager.readFileToString(newFile);
                 } catch (IOException e) {
-                    System.out.println("An error occurred while creating/writing to the file.");
-                    e.printStackTrace();
+                    throw new RuntimeException(e);
                 }
-
                 mainFrame.getTextEditorPanel().getTextArea().setText(content);
                 refreshSidebar();
                 break;

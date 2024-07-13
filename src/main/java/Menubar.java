@@ -1,3 +1,5 @@
+import org.fife.ui.rtextarea.RTextArea;
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -25,27 +27,47 @@ public class Menubar extends JMenuBar implements ActionListener {
         fileMenu.add(saveAsMI);
 
         JMenu editMenu = new JMenu("Edit");
-        JMenuItem undoMI = new JMenuItem("Undo");
-        JMenuItem redoMI = new JMenuItem("Redo");
-        JMenuItem cutMI = new JMenuItem("Cut");
-        JMenuItem copyMI = new JMenuItem("Copy");
-        JMenuItem pasteMI = new JMenuItem("Paste");
-        undoMI.addActionListener(this);
-        redoMI.addActionListener(this);
-        cutMI.addActionListener(this);
-        copyMI.addActionListener(this);
-        pasteMI.addActionListener(this);
-        editMenu.add(undoMI);
-        editMenu.add(redoMI);
-        editMenu.add(cutMI);
-        editMenu.add(copyMI);
-        editMenu.add(pasteMI);
 
-        JMenu formatMenu = new JMenu("Format");
+        editMenu.add(createMenuItem(RTextArea.getAction(RTextArea.UNDO_ACTION)));
+        editMenu.add(createMenuItem(RTextArea.getAction(RTextArea.REDO_ACTION)));
+        editMenu.addSeparator();
+        editMenu.add(createMenuItem(RTextArea.getAction(RTextArea.CUT_ACTION)));
+        editMenu.add(createMenuItem(RTextArea.getAction(RTextArea.COPY_ACTION)));
+        editMenu.add(createMenuItem(RTextArea.getAction(RTextArea.PASTE_ACTION)));
+        editMenu.add(createMenuItem(RTextArea.getAction(RTextArea.DELETE_ACTION)));
+        editMenu.addSeparator();
+        editMenu.add(createMenuItem(RTextArea.getAction(RTextArea.SELECT_ALL_ACTION)));
+
+
+
+
+//        JMenuItem undoMI = new JMenuItem("Undo");
+//        JMenuItem redoMI = new JMenuItem("Redo");
+//        JMenuItem cutMI = new JMenuItem("Cut");
+//        JMenuItem copyMI = new JMenuItem("Copy");
+//        JMenuItem pasteMI = new JMenuItem("Paste");
+//        undoMI.addActionListener(this);
+//        redoMI.addActionListener(this);
+//        cutMI.addActionListener(this);
+//        copyMI.addActionListener(this);
+//        pasteMI.addActionListener(this);
+//        editMenu.add(undoMI);
+//        editMenu.add(redoMI);
+//        editMenu.add(cutMI);
+//        editMenu.add(copyMI);
+//        editMenu.add(pasteMI);
+
+
 
         add(fileMenu);
         add(editMenu);
-        add(formatMenu);
+
+
+
+
+
+
+
     }
 
     @Override
@@ -53,21 +75,6 @@ public class Menubar extends JMenuBar implements ActionListener {
         String command = e.getActionCommand();
         TextEditor textEditorPanel = mainFrame.getTextEditorPanel();
         switch (command) {
-            case "Cut":
-                textEditorPanel.getTextArea().cut();
-                break;
-            case "Copy":
-                textEditorPanel.getTextArea().copy();
-                break;
-            case "Paste":
-                textEditorPanel.getTextArea().paste();
-                break;
-            case "Undo":
-                textEditorPanel.getUndoManager().undo();
-                break;
-            case "Redo":
-                textEditorPanel.getUndoManager().redo();
-                break;
             case "Save":
                 try {
                     textEditorPanel.saveFile();
@@ -75,21 +82,9 @@ public class Menubar extends JMenuBar implements ActionListener {
                     ex.printStackTrace();
                 }
                 break;
-//            case "Save As":
-//                JFileChooser fileChooser = new JFileChooser();
-//                if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
-//                    File file = fileChooser.getSelectedFile();
-//                    mainFrame.setLastOpenedFile(file);
-//                    try {
-//                        textEditorPanel.saveFile();
-//                    } catch (IOException ex) {
-//                        ex.printStackTrace();
-//                    }
-//                }
-//                mainFrame.getSidebarPanel().refreshSidebar();
-//                break;
             case "Open":
-                JFileChooser openFileChooser = new JFileChooser();
+                JFileChooser openFileChooser = new JFileChooser("c:/Documents");
+
                 if (openFileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
                     File file = openFileChooser.getSelectedFile();
                     FileManager.saveLastOpenedFilePath(file.getAbsolutePath());
@@ -104,8 +99,30 @@ public class Menubar extends JMenuBar implements ActionListener {
                 mainFrame.getSidebarPanel().refreshSidebar();
                 break;
             case "New":
-                // Implement the New action logic here
+                JFileChooser newFileChooser = new JFileChooser();
+                newFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                if (newFileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+                    File dir = newFileChooser.getSelectedFile();
+                    File file;
+
+
+                    file = FileManager.createMainTeX("main.tex",dir.getAbsolutePath());
+
+                    FileManager.saveLastOpenedFilePath(file.getAbsolutePath());
+                    FileManager.setMainTexFile(file.getAbsolutePath());
+                    try {
+                        String content = FileManager.readFileToString(file);
+                        textEditorPanel.getTextArea().setText(content);
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
                 break;
         }
+    }
+    private static JMenuItem createMenuItem(Action action) {
+        JMenuItem item = new JMenuItem(action);
+        item.setToolTipText(null); // Swing annoyingly adds tool tip text to the menu item
+        return item;
     }
 }

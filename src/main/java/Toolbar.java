@@ -1,5 +1,9 @@
+import org.fife.ui.rtextarea.SearchContext;
+import org.fife.ui.rtextarea.SearchEngine;
+
 import javax.swing.*;
 import javax.xml.transform.TransformerException;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -8,6 +12,9 @@ import java.io.IOException;
 public class Toolbar extends JToolBar implements ActionListener   {
     private Main mainFrame;
     private File mainTeXFile;
+
+    private JTextField searchField;
+
 
     private boolean isSidebarVisible = true;
 
@@ -19,28 +26,57 @@ public class Toolbar extends JToolBar implements ActionListener   {
         JButton undoButton = new JButton("Undo");
         JButton redoButton = new JButton("Redo");
         JButton saveButton = new JButton("Save");
-        JButton saveAsButton = new JButton("Save As");
+
 
         toggleSidebarButton.addActionListener(this);
         reCompileButton.addActionListener(this);
         undoButton.addActionListener(this);
         redoButton.addActionListener(this);
         saveButton.addActionListener(this);
-        saveAsButton.addActionListener(this);
+
 
         add(toggleSidebarButton);
+
+        addSeparator();
+
+        searchField = new JTextField(10);
+        searchField.setMaximumSize(searchField.getPreferredSize());
+
+        add(searchField);
+        final JButton nextButton = new JButton("Find Next");
+        nextButton.setActionCommand("FindNext");
+        nextButton.addActionListener(this);
+        add(nextButton);
+        searchField.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                nextButton.doClick(0);
+            }
+        });
+        JButton prevButton = new JButton("Find Previous");
+        prevButton.setActionCommand("FindPrev");
+        prevButton.addActionListener(this);
+        add(prevButton);
+
+        addSeparator();
+
+        add(saveButton);
         add(undoButton);
         add(redoButton);
-        add(saveButton);
-        add(saveAsButton);
+
+        addSeparator();
+        //add(saveAsButton);
+        add(Box.createGlue());
         add(reCompileButton);
+
     }
+
 
     @Override
     public void actionPerformed(ActionEvent e) {
         String command = e.getActionCommand();
         TextEditor textEditorPanel = mainFrame.getTextEditorPanel();
         Sidebar sidebarPanel = mainFrame.getSidebarPanel();
+
         switch (command) {
             case "Undo":
                 textEditorPanel.getUndoManager().undo();
@@ -55,19 +91,7 @@ public class Toolbar extends JToolBar implements ActionListener   {
                     ex.printStackTrace();
                 }
                 break;
-//            case "Save As":
-//                JFileChooser fileChooser = new JFileChooser();
-//                if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
-//                    File file = fileChooser.getSelectedFile();
-//                    mainFrame.setLastOpenedFile(file);
-//                    try {
-//                        textEditorPanel.saveFile();
-//                    } catch (IOException ex) {
-//                        ex.printStackTrace();
-//                    }
-//                }
-//                mainFrame.getSidebarPanel().refreshSidebar();
-//                break;
+
             case "Toggle Sidebar":
                 if (isSidebarVisible) {
                     sidebarPanel.setVisible(false);
@@ -98,5 +122,25 @@ public class Toolbar extends JToolBar implements ActionListener   {
                 mainFrame.getSidebarPanel().refreshSidebar();
                 JOptionPane.showMessageDialog( this, "Refreshed!");
         }
+
+        // "FindNext" => search forward, "FindPrev" => search backward
+
+        boolean forward = "FindNext".equals(command);
+
+        // Create an object defining our search parameters.
+        SearchContext context = new SearchContext();
+        String text = searchField.getText();
+        if (text.length() == 0) {
+            return;
+        }
+        context.setSearchFor(text);
+        context.setSearchForward(forward);
+        context.setWholeWord(false);
+
+        boolean found = SearchEngine.find(mainFrame.getTextEditorPanel().getTextArea(), context).wasFound();
+        if (!found) {
+            JOptionPane.showMessageDialog(this, "Text not found");
+        }
+
     }
 }

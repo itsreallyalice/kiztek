@@ -11,7 +11,32 @@ public class FileManager {
 
 
 
+    public static File createMainTeX(String name, String path){
+        String content = "\\documentclass{article}\n\n"
+                + "\\begin{document}\n\n"
+                + "(Type your content here.)\n\n"
+                + "\\end{document}";
 
+        File newFile;
+        String baseFilename = JOptionPane.showInputDialog(null,"New File",name);
+
+
+        try {
+
+            newFile = FileManager.createNewFile(baseFilename,path);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+
+        try (FileWriter fileWriter = new FileWriter(newFile)) {
+            fileWriter.write(content);
+            System.out.println("File created and content written successfully.");
+        } catch (IOException e) {
+            System.out.println("An error occurred while creating/writing to the file.");
+            e.printStackTrace();
+        }
+        return newFile;
+    }
     public static String getMainTexFile() {
         Properties properties = new Properties();
         // Load existing properties
