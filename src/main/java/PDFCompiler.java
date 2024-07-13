@@ -3,7 +3,6 @@ import org.apache.commons.io.FilenameUtils;
 import javax.xml.transform.ErrorListener;
 import javax.xml.transform.TransformerException;
 import java.io.*;
-import java.nio.file.Files;
 
 public class PDFCompiler {
 
@@ -11,7 +10,7 @@ public class PDFCompiler {
     public void setErrorListener(ErrorListener errorListener) {
         this.errorListener = errorListener;
     }
-    public static File compile(File latexDocument) throws TransformerException {
+    public static File compilepdflatexbibtexpdflatex(File latexDocument) throws TransformerException {
         try {
             File tempFile = File.createTempFile("tempLatex", ".tex");
             tempFile.deleteOnExit();
@@ -98,4 +97,41 @@ public class PDFCompiler {
         }
         return null;
     }
+    public static File compilepdflatex(File latexDocument) throws TransformerException {
+
+        try {
+            File tempFile = File.createTempFile("tempLatex", ".tex");
+            tempFile.deleteOnExit();
+
+            ProcessBuilder latexProcessBuilder = new ProcessBuilder("pdflatex", "-interaction=nonstopmode", latexDocument.getName()).directory(latexDocument.getParentFile());
+            latexProcessBuilder.redirectErrorStream(true);
+            Process latexProcess = latexProcessBuilder.start();
+            try (InputStream inputStream = latexProcess.getInputStream();
+                 InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
+
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    System.out.println(line);
+                }
+            }
+            int latex1ExitCode = latexProcess.waitFor();
+            System.out.println("latex[1] exited with code: " + latex1ExitCode);
+            latexProcess.waitFor();
+            int exitCode = latexProcess.exitValue();
+            if (exitCode == 0) {
+
+                File pdfFile = new File(tempFile.getParent(), latexDocument.getName().replace(".tex", ".pdf"));
+                return pdfFile;
+            } else {
+                System.err.println("Compilation failed with exit code: " + exitCode);
+            }
+        }catch (IOException | InterruptedException e) {
+
+            if (errorListener != null) {
+                errorListener.error((TransformerException) e);
+            }
+        }
+        return null;}
+
 }

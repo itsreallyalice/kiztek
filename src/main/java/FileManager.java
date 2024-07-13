@@ -7,6 +7,7 @@ public class FileManager {
     private static final String PROPERTIES_FILE_BASE_NAME = "config";
     private static final String LAST_OPENED_FILE_KEY = "lastOpenedFile";
     private static final String MAIN_TEX_FILE_KEY = "mainTexFile";
+    private static final String COMPILER_KEY = "currentCompiler";
 
 
 
@@ -132,6 +133,45 @@ public class FileManager {
         }
         System.out.println("last opened file" + path);
     }
+
+    public static String getCompilerKey() {
+        Properties properties = new Properties();
+        // Load existing properties
+        try (InputStream input = FileManager.class.getClassLoader().getResourceAsStream(PROPERTIES_FILE_BASE_NAME + ".properties")) {
+            if (input != null) {
+                properties.load(input);
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        if (properties.getProperty(COMPILER_KEY) == null) {
+            return "pdflatexbibtexpdflatex";
+        }
+        else{
+            return properties.getProperty(COMPILER_KEY);}
+    }
+
+    public static void setCompiler(String compiler) {
+        Properties properties = new Properties();
+        // Load existing properties
+        try (InputStream input = FileManager.class.getClassLoader().getResourceAsStream(PROPERTIES_FILE_BASE_NAME + ".properties")) {
+            if (input != null) {
+                properties.load(input);
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        // Set the new property
+        properties.setProperty(COMPILER_KEY, compiler);
+        // Save properties back to the file
+        try (OutputStream output = new FileOutputStream(new File(FileManager.class.getClassLoader().getResource(PROPERTIES_FILE_BASE_NAME + ".properties").toURI()))) {
+            properties.store(output, null);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+    }
+
     public static File createNewFile(String baseName, String path) throws IOException {
         File file = new File(path, baseName);
         int counter = 1;

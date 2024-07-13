@@ -4,7 +4,6 @@ import org.fife.ui.rtextarea.SearchEngine;
 
 import javax.swing.*;
 import javax.xml.transform.TransformerException;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -27,6 +26,7 @@ public class Toolbar extends JToolBar implements ActionListener   {
         JButton undoButton = new JButton(RTextArea.getAction(RTextArea.UNDO_ACTION));
         JButton redoButton = new JButton(RTextArea.getAction(RTextArea.REDO_ACTION));
         JButton saveButton = new JButton("Save");
+        JButton settingsButton = new JButton("Settings");
 
         JButton sectionButton = new JButton("Section");
 
@@ -106,9 +106,11 @@ public class Toolbar extends JToolBar implements ActionListener   {
 
         toggleSidebarButton.addActionListener(this);
         reCompileButton.addActionListener(this);
+        settingsButton.addActionListener(this);
         undoButton.addActionListener(this);
         redoButton.addActionListener(this);
         saveButton.addActionListener(this);
+
 
 
         add(toggleSidebarButton);
@@ -149,6 +151,7 @@ public class Toolbar extends JToolBar implements ActionListener   {
         addSeparator();
         //add(saveAsButton);
         add(Box.createGlue());
+        add(settingsButton);
         add(reCompileButton);
 
     }
@@ -190,14 +193,44 @@ public class Toolbar extends JToolBar implements ActionListener   {
                 }
                 PDFCompiler compiler = new PDFCompiler();
                 compiler.setErrorListener(mainFrame);
-                try {
-                    mainFrame.getPdfViewerPanel().getController().openDocument(PDFCompiler.compile(new File(FileManager.getMainTexFile())).getPath());
-                } catch (TransformerException ex) {
-                    throw new RuntimeException(ex);
+
+                switch (FileManager.getCompilerKey()) {
+                    case "pdflatex+bibtex+pdflatex":
+                        try {
+                            mainFrame.getPdfViewerPanel().getController().openDocument(PDFCompiler.compilepdflatexbibtexpdflatex(new File(FileManager.getMainTexFile())).getPath());
+                        } catch (TransformerException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                        break;
+                    case "pdflatex":
+                        try {
+                            mainFrame.getPdfViewerPanel().getController().openDocument(PDFCompiler.compilepdflatex(new File(FileManager.getMainTexFile())).getPath());
+                        } catch (TransformerException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                        break;
+                    case "bibtex":
+
+                        break;
+                    case "xetex":
+                        break;
+                    case "luatex":
+
+                        break;
                 }
+
+//                try {
+//                    mainFrame.getPdfViewerPanel().getController().openDocument(PDFCompiler.compilepdflatexbibtexpdflatex(new File(FileManager.getMainTexFile())).getPath());
+//                } catch (TransformerException ex) {
+//                    throw new RuntimeException(ex);
+//                }
 
                 mainFrame.getSidebarPanel().refreshSidebar();
                 JOptionPane.showMessageDialog( this, "Refreshed!");
+                break;
+
+            case "Settings":
+                new Settings(mainFrame);
                 break;
             case "Section":
                 mainFrame.getTextEditorPanel().insertAtCursor(mainFrame.getTextEditorPanel().getTextArea(), "\\section{}");
