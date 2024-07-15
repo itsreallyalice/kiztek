@@ -103,6 +103,7 @@ public class FileManager {
                 properties.load(input);
             }
         } catch (IOException ex) {
+            System.out.println("why?");
             ex.printStackTrace();
         }
         // Set the new property
@@ -133,6 +134,7 @@ public class FileManager {
         try {
             properties.store(new FileOutputStream(PROPERTIES_FILE_BASE_NAME + ".properties"), null);
         } catch (IOException e) {
+            System.out.println("why?");
             throw new RuntimeException(e);
         }
 
@@ -176,6 +178,7 @@ public class FileManager {
         try {
             properties.store(new FileOutputStream(PROPERTIES_FILE_BASE_NAME + ".properties"), null);
         } catch (IOException e) {
+            System.out.println("why?");
             throw new RuntimeException(e);
         }
 
