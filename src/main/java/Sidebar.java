@@ -52,7 +52,11 @@ public class Sidebar extends JPanel implements ActionListener {
                         File tempFile = FileManager.getLastOpenedFilePathNew();
                         File file = new File(tempFile.getParent(), selectedFile);
                         System.out.println(file.getAbsolutePath());
-                        FileManager.saveLastOpenedFilePath(file.getAbsolutePath());
+                        try {
+                            FileManager.saveLastOpenedFilePath(file.getAbsolutePath());
+                        } catch (IOException ex) {
+                            throw new RuntimeException(ex);
+                        }
                         try {
                             String content = FileManager.readFileToString(file);
                             mainFrame.getTextEditorPanel().getTextArea().setText(content);
@@ -154,7 +158,13 @@ public class Sidebar extends JPanel implements ActionListener {
         boolean isFilter = filterButton.isSelected();
         File currentFile = FileManager.getLastOpenedFilePathNew();
         File currentDir = new File(currentFile.getParent());
-        ArrayList<String> files = new ArrayList<String>(Arrays.asList(currentDir.list()));
+        ArrayList<String> files = new ArrayList<String>();
+        try {files = new ArrayList<String>(Arrays.asList(currentDir.list()));}
+
+        catch (NullPointerException e){
+            e.printStackTrace();
+        }
+
 
         ArrayList<String> newList = new ArrayList<>();
 

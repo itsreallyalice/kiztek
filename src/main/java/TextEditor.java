@@ -7,6 +7,7 @@ import javax.swing.event.UndoableEditListener;
 import javax.swing.undo.UndoManager;
 import java.awt.*;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -22,7 +23,14 @@ public class TextEditor extends JPanel {
 
 
         File tempFile = FileManager.getLastOpenedFilePathNew();
-        String content = FileManager.readFileToString(tempFile);
+
+        String content = "";
+        try {content = FileManager.readFileToString(tempFile);}
+
+        catch (IOException e) {
+            textArea.setText("");
+        }
+
         textArea.setText(content);
 
 

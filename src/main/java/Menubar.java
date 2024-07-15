@@ -87,7 +87,11 @@ public class Menubar extends JMenuBar implements ActionListener {
 
                 if (openFileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
                     File file = openFileChooser.getSelectedFile();
-                    FileManager.saveLastOpenedFilePath(file.getAbsolutePath());
+                    try {
+                        FileManager.saveLastOpenedFilePath(file.getAbsolutePath());
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
                     FileManager.setMainTexFile(file.getAbsolutePath());
                     try {
                         String content = FileManager.readFileToString(file);
@@ -105,7 +109,11 @@ public class Menubar extends JMenuBar implements ActionListener {
                     File dir = newFileChooser.getSelectedFile();
                     File file;
                     file = FileManager.createMainTeX("main.tex",dir.getAbsolutePath());
-                    FileManager.saveLastOpenedFilePath(file.getAbsolutePath());
+                    try {
+                        FileManager.saveLastOpenedFilePath(file.getAbsolutePath());
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
                     FileManager.setMainTexFile(file.getAbsolutePath());
                     try {
                         String content = FileManager.readFileToString(file);

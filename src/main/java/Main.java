@@ -34,12 +34,16 @@ public class Main extends JFrame implements ErrorListener {
 
     private Menubar menubarPanel;
 
+
+
     public Main () throws IOException, UnsupportedLookAndFeelException {
 
 
         FlatLightLaf.setup();
 
         UIManager.setLookAndFeel(new FlatLightLaf());
+
+
 
         setTitle("KiZTeK: The best LaTeX compiler!");
         ImageIcon logo = new ImageIcon(getClass().getResource("logo.png"));
@@ -48,7 +52,6 @@ public class Main extends JFrame implements ErrorListener {
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setLocationRelativeTo(null);
 
-        //lastOpenedFile = new File(FileManager.getLastOpenedFilePath());
 
         textEditorPanel = new TextEditor();
         pdfViewerPanel = new PDFViewer();
@@ -74,7 +77,7 @@ public class Main extends JFrame implements ErrorListener {
             public void windowClosing(WindowEvent e) {
                 super.windowClosing(e);
 
-                    //FileManager.saveLastOpenedFilePath(lastOpenedFile.getAbsolutePath());
+
 
             }
         });

@@ -46,12 +46,15 @@ public class FileManager {
                 properties.load(input);
             }
         } catch (IOException ex) {
+
             ex.printStackTrace();
         }
+
         if (properties.getProperty(MAIN_TEX_FILE_KEY) == null) {
             return new JFileChooser().getFileSystemView().getDefaultDirectory().toString();
         }
         else{
+
             return properties.getProperty(MAIN_TEX_FILE_KEY);}
     }
 //    public static String getLastOpenedFilePath() {
@@ -72,6 +75,7 @@ public class FileManager {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+
         if (properties.getProperty(LAST_OPENED_FILE_KEY) == null) {
             File tempFile = new File(new JFileChooser().getFileSystemView().getDefaultDirectory().toString());
             return new File(new JFileChooser().getFileSystemView().getDefaultDirectory().toString());
@@ -104,14 +108,14 @@ public class FileManager {
         // Set the new property
         properties.setProperty(MAIN_TEX_FILE_KEY, path);
         // Save properties back to the file
-        try (OutputStream output = new FileOutputStream(new File(FileManager.class.getClassLoader().getResource(PROPERTIES_FILE_BASE_NAME + ".properties").toURI()))) {
-            properties.store(output, null);
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        try {
+            properties.store(new FileOutputStream(PROPERTIES_FILE_BASE_NAME + ".properties"), null);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
     }
-    public static void saveLastOpenedFilePath(String path) {
+    public static void saveLastOpenedFilePath(String path) throws IOException {
 
         Properties properties = new Properties();
         // Load existing properties
@@ -123,15 +127,18 @@ public class FileManager {
             ex.printStackTrace();
         }
         // Set the new property
-        System.out.println(path);
+
         properties.setProperty(LAST_OPENED_FILE_KEY, path);
         // Save properties back to the file
-        try (OutputStream output = new FileOutputStream(new File(FileManager.class.getClassLoader().getResource(PROPERTIES_FILE_BASE_NAME + ".properties").toURI()))) {
-            properties.store(output, null);
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        try {
+            properties.store(new FileOutputStream(PROPERTIES_FILE_BASE_NAME + ".properties"), null);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        System.out.println("last opened file" + path);
+
+
+
+
     }
 
     public static String getCompilerKey() {
@@ -144,11 +151,13 @@ public class FileManager {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+
         if (properties.getProperty(COMPILER_KEY) == null) {
             return "pdflatexbibtexpdflatex";
         }
         else{
             return properties.getProperty(COMPILER_KEY);}
+
     }
 
     public static void setCompiler(String compiler) {
@@ -164,10 +173,10 @@ public class FileManager {
         // Set the new property
         properties.setProperty(COMPILER_KEY, compiler);
         // Save properties back to the file
-        try (OutputStream output = new FileOutputStream(new File(FileManager.class.getClassLoader().getResource(PROPERTIES_FILE_BASE_NAME + ".properties").toURI()))) {
-            properties.store(output, null);
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        try {
+            properties.store(new FileOutputStream(PROPERTIES_FILE_BASE_NAME + ".properties"), null);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
     }
