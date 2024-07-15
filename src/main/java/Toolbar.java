@@ -4,6 +4,7 @@ import org.fife.ui.rtextarea.SearchEngine;
 
 import javax.swing.*;
 import javax.xml.transform.TransformerException;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -118,9 +119,16 @@ public class Toolbar extends JToolBar implements ActionListener   {
         addSeparator();
 
         searchField = new JTextField(10);
+        JLabel searchLabel = new JLabel("Search:");
         searchField.setMaximumSize(searchField.getPreferredSize());
 
+        add(searchLabel);
         add(searchField);
+
+
+
+
+
         final JButton nextButton = new JButton("Find Next");
         nextButton.setActionCommand("FindNext");
         nextButton.addActionListener(this);
@@ -199,7 +207,10 @@ public class Toolbar extends JToolBar implements ActionListener   {
                         try {
                             mainFrame.getPdfViewerPanel().getController().openDocument(PDFCompiler.compilepdflatexbibtexpdflatex(new File(FileManager.getMainTexFile())).getPath());
                         } catch (TransformerException ex) {
+                            System.out.println("error time");
+
                             throw new RuntimeException(ex);
+
                         }
                         break;
                     case "pdflatex":
@@ -210,12 +221,25 @@ public class Toolbar extends JToolBar implements ActionListener   {
                         }
                         break;
                     case "bibtex":
-
+                        try {
+                            mainFrame.getPdfViewerPanel().getController().openDocument(PDFCompiler.compilebibtex(new File(FileManager.getMainTexFile())).getPath());
+                        } catch (TransformerException ex) {
+                            throw new RuntimeException(ex);
+                        }
                         break;
-                    case "xetex":
+                    case "xelatex":
+                        try {
+                            mainFrame.getPdfViewerPanel().getController().openDocument(PDFCompiler.compilexelatex(new File(FileManager.getMainTexFile())).getPath());
+                        } catch (TransformerException ex) {
+                            throw new RuntimeException(ex);
+                        }
                         break;
-                    case "luatex":
-
+                    case "lualatex":
+                        try {
+                            mainFrame.getPdfViewerPanel().getController().openDocument(PDFCompiler.compilelualatex(new File(FileManager.getMainTexFile())).getPath());
+                        } catch (TransformerException ex) {
+                            throw new RuntimeException(ex);
+                        }
                         break;
                 }
 
@@ -231,6 +255,7 @@ public class Toolbar extends JToolBar implements ActionListener   {
 
             case "Settings":
                 new Settings(mainFrame);
+
                 break;
             case "Section":
                 mainFrame.getTextEditorPanel().insertAtCursor(mainFrame.getTextEditorPanel().getTextArea(), "\\section{}");

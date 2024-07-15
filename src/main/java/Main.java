@@ -18,6 +18,9 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+
+
+import com.formdev.flatlaf.FlatLightLaf;
 import org.fife.ui.rtextarea.*;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
@@ -31,7 +34,12 @@ public class Main extends JFrame implements ErrorListener {
 
     private Menubar menubarPanel;
 
-    public Main () throws IOException{
+    public Main () throws IOException, UnsupportedLookAndFeelException {
+
+
+        FlatLightLaf.setup();
+
+        UIManager.setLookAndFeel(new FlatLightLaf());
 
         setTitle("KiZTeK: The best LaTeX compiler!");
         ImageIcon logo = new ImageIcon(getClass().getResource("logo.png"));
@@ -92,7 +100,11 @@ public class Main extends JFrame implements ErrorListener {
 
     public static void main(String[] args) throws IOException {
 
-        new Main();
+        try {
+            new Main();
+        } catch (UnsupportedLookAndFeelException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

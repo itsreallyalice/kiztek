@@ -22,6 +22,10 @@ class Settings extends JDialog {
 
         JLabel compilerLabel = new JLabel("LaTeX Compiler:");
         String[] compilers = {"pdflatex+bibtex+pdflatex","pdflatex", "bibtex", "xelatex", "lualatex"};
+
+
+        String compilerString = FileManager.getCompilerKey();
+
         compilerComboBox = new JComboBox<>(compilers);
 
         JButton saveButton = new JButton("Save Changes");
@@ -61,6 +65,7 @@ class Settings extends JDialog {
         gbc.gridwidth = 3;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         add(compilerComboBox, gbc);
+        compilerComboBox.setSelectedItem(FileManager.getCompilerKey());
 
         // Add saveButton
         gbc.gridx = 0;
@@ -93,6 +98,7 @@ class Settings extends JDialog {
                 FileManager.setCompiler(selectedCompiler);
                 System.out.println("Selected main.tex file: " + selectedFile);
                 System.out.println("Selected LaTeX compiler: " + selectedCompiler);
+
                 dispose();
             }
         });

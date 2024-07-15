@@ -114,6 +114,7 @@ public class Menubar extends JMenuBar implements ActionListener {
                         ex.printStackTrace();
                     }
                 }
+                mainFrame.getSidebarPanel().refreshSidebar();
                 break;
         }
     }
