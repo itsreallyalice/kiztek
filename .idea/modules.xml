@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$USER_HOME$/Downloads/icepdf-custom/core/core-awt/target/generated-sources/generated-sources.iml" filepath="$USER_HOME$/Downloads/icepdf-custom/core/core-awt/target/generated-sources/generated-sources.iml" />
+      <module fileurl="file://$PROJECT_DIR$/latex_compiler.iml" filepath="$PROJECT_DIR$/latex_compiler.iml" />
       <module fileurl="file://$USER_HOME$/Downloads/icepdf-custom/core/core-awt/src/main/main.iml" filepath="$USER_HOME$/Downloads/icepdf-custom/core/core-awt/src/main/main.iml" />
       <module fileurl="file://$USER_HOME$/Downloads/icepdf-custom/qa/qa.iml" filepath="$USER_HOME$/Downloads/icepdf-custom/qa/qa.iml" />
       <module fileurl="file://$USER_HOME$/Downloads/icepdf-custom/core/core-awt/target/target.iml" filepath="$USER_HOME$/Downloads/icepdf-custom/core/core-awt/target/target.iml" />

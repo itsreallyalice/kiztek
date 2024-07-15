@@ -30,6 +30,16 @@
 <!--            <artifactId>icepdf-viewer</artifactId>-->
 <!--            <version>7.2.0</version>-->
 <!--        </dependency>-->
+        <!-- https://mvnrepository.com/artifact/com.formdev/flatlaf -->
+        <dependency>
+            <groupId>com.formdev</groupId>
+            <artifactId>flatlaf</artifactId>
+            <version>3.4.1</version>
+            <scope>runtime</scope>
+        </dependency>
+
+
+
         <dependency>
             <groupId>com.github.pcorless.icepdf</groupId>
             <artifactId>icepdf-viewer</artifactId>
