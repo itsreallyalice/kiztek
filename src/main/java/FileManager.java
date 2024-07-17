@@ -10,7 +10,7 @@ public class FileManager {
     private static final String MAIN_TEX_FILE_KEY = "mainTexFile";
     private static final String COMPILER_KEY = "currentCompiler";
 
-    public static Preferences preferences;
+    //public static Preferences preferences;
 
 
     public static File createMainTeX(String name, String path){
@@ -73,7 +73,7 @@ public class FileManager {
 
     public static String getCompilerKey() {
         Preferences preferences = Preferences.userRoot().node(FileManager.class.getName());
-        return preferences.get(COMPILER_KEY,"") ;
+        return preferences.get(COMPILER_KEY,"pdflatex+bibtex+pdflatex") ;
 
     }
 
