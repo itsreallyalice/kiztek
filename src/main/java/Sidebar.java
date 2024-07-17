@@ -157,7 +157,12 @@ public class Sidebar extends JPanel implements ActionListener {
     public void refreshSidebar() {
         boolean isFilter = filterButton.isSelected();
         File currentFile = FileManager.getLastOpenedFilePathNew();
-        File currentDir = new File(currentFile.getParent());
+        File currentDir = null;
+        try {currentDir = new File(currentFile.getParent());}
+        catch (NullPointerException e) {
+            e.printStackTrace();
+        }
+
         ArrayList<String> files = new ArrayList<String>();
         try {files = new ArrayList<String>(Arrays.asList(currentDir.list()));}
 

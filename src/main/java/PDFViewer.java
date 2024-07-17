@@ -3,7 +3,7 @@ import org.icepdf.ri.common.*;
 import javax.swing.*;
 import java.awt.*;
 
-public class PDFViewer extends JPanel {
+public class    PDFViewer extends JPanel {
     private SwingController controller;
 
     public PDFViewer() {
