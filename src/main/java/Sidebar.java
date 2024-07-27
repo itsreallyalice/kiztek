@@ -6,13 +6,11 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 public class Sidebar extends JPanel implements ActionListener {
     private JList<String> fileList;
@@ -49,9 +47,8 @@ public class Sidebar extends JPanel implements ActionListener {
                     String selectedFile = fileList.getSelectedValue();
                     if (selectedFile != null) {
 
-                        File tempFile = FileManager.getLastOpenedFilePathNew();
+                        File tempFile = FileManager.getLastOpenedFilePath();
                         File file = new File(tempFile.getParent(), selectedFile);
-                        System.out.println(file.getAbsolutePath());
                         try {
                             FileManager.saveLastOpenedFilePath(file.getAbsolutePath());
                         } catch (IOException ex) {
@@ -77,30 +74,7 @@ public class Sidebar extends JPanel implements ActionListener {
 
         switch (command) {
             case "New File":
-//                String content = "\\documentclass{article}\n\n"
-//                        + "\\begin{document}\n\n"
-//                        + "(Type your content here.)\n\n"
-//                        + "\\end{document}";
-//
-//                File newFile;
-//                String baseFilename = JOptionPane.showInputDialog(null,"New File","untitled.tex");
-//
-//
-//                try {
-//
-//                    newFile = FileManager.createNewFile(baseFilename,FileManager.getLastOpenedFilePathNew().getParent());
-//                } catch (IOException ex) {
-//                    throw new RuntimeException(ex);
-//                }
-//
-//                try (FileWriter fileWriter = new FileWriter(newFile)) {
-//                    fileWriter.write(content);
-//                    System.out.println("File created and content written successfully.");
-//                } catch (IOException e) {
-//                    System.out.println("An error occurred while creating/writing to the file.");
-//                    e.printStackTrace();
-//                }
-                File newFile = FileManager.createMainTeX("untitled.tex", FileManager.getLastOpenedFilePathNew().getParent());
+                File newFile = FileManager.createTeXFile("untitled.tex", FileManager.getLastOpenedFilePath().getParent());
                 String content = null;
                 try {
                     content = FileManager.readFileToString(newFile);
@@ -134,7 +108,7 @@ public class Sidebar extends JPanel implements ActionListener {
             int result = fileChooser.showOpenDialog(null);
             if (result == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = fileChooser.getSelectedFile();
-                File tempFile = new File(FileManager.getLastOpenedFilePathNew().getParent(), selectedFile.getName());
+                File tempFile = new File(FileManager.getLastOpenedFilePath().getParent(), selectedFile.getName());
                 try {
                     Files.copy(selectedFile.toPath(), tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 } catch (IOException ex) {
@@ -156,7 +130,7 @@ public class Sidebar extends JPanel implements ActionListener {
 
     public void refreshSidebar() {
         boolean isFilter = filterButton.isSelected();
-        File currentFile = FileManager.getLastOpenedFilePathNew();
+        File currentFile = FileManager.getLastOpenedFilePath();
         File currentDir = null;
         try {currentDir = new File(currentFile.getParent());}
         catch (NullPointerException e) {
@@ -164,14 +138,15 @@ public class Sidebar extends JPanel implements ActionListener {
         }
 
         ArrayList<String> files = new ArrayList<String>();
+        //Turns current directory to a list
         try {files = new ArrayList<String>(Arrays.asList(currentDir.list()));}
 
         catch (NullPointerException e){
             e.printStackTrace();
         }
 
-
         ArrayList<String> newList = new ArrayList<>();
+
 
         if (isFilter) {
             for (String element : files) {

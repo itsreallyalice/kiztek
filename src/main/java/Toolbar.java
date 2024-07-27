@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 
 public class Toolbar extends JToolBar implements ActionListener   {
     private Main mainFrame;
@@ -125,10 +126,6 @@ public class Toolbar extends JToolBar implements ActionListener   {
         add(searchLabel);
         add(searchField);
 
-
-
-
-
         final JButton nextButton = new JButton("Find Next");
         nextButton.setActionCommand("FindNext");
         nextButton.addActionListener(this);
@@ -157,7 +154,6 @@ public class Toolbar extends JToolBar implements ActionListener   {
         add(insertButton);
 
         addSeparator();
-        //add(saveAsButton);
         add(Box.createGlue());
         add(settingsButton);
         add(reCompileButton);
@@ -174,7 +170,7 @@ public class Toolbar extends JToolBar implements ActionListener   {
         switch (command) {
             case "Save":
                 try {
-                    textEditorPanel.saveFile();
+                    mainFrame.getTextEditorPanel().saveFile();
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
@@ -192,7 +188,7 @@ public class Toolbar extends JToolBar implements ActionListener   {
                 }
                 break;
             case "Recompile":
-                                //Save whatever is inside textfield
+                //Save whatever is inside textfield
                 //Main tex file is compiled instead of text box#
                 try {
                     textEditorPanel.saveFile();
@@ -205,7 +201,8 @@ public class Toolbar extends JToolBar implements ActionListener   {
                 switch (FileManager.getCompilerKey()) {
                     case "pdflatex+bibtex+pdflatex":
                         try {
-                            mainFrame.getPdfViewerPanel().getController().openDocument(PDFCompiler.compilepdflatexbibtexpdflatex(new File(FileManager.getMainTexFile())).getPath());
+                            mainFrame.getPdfViewerPanel().getController().openDocument(
+                                    PDFCompiler.compilepdflatexbibtexpdflatex(new File(FileManager.getMainTexFile())).getPath());
                         } catch (TransformerException ex) {
                             System.out.println("error time");
 
@@ -242,15 +239,6 @@ public class Toolbar extends JToolBar implements ActionListener   {
                         }
                         break;
                 }
-
-//                try {
-//                    mainFrame.getPdfViewerPanel().getController().openDocument(PDFCompiler.compilepdflatexbibtexpdflatex(new File(FileManager.getMainTexFile())).getPath());
-//                } catch (TransformerException ex) {
-//                    throw new RuntimeException(ex);
-//                }
-
-                mainFrame.getSidebarPanel().refreshSidebar();
-                JOptionPane.showMessageDialog( this, "Refreshed!");
                 break;
 
             case "Settings":

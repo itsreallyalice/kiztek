@@ -2,12 +2,9 @@ import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 
 import javax.swing.*;
-import javax.swing.event.UndoableEditEvent;
-import javax.swing.event.UndoableEditListener;
 import javax.swing.undo.UndoManager;
 import java.awt.*;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -22,7 +19,7 @@ public class TextEditor extends JPanel {
         textArea.setCodeFoldingEnabled(true);
 
 
-        File tempFile = FileManager.getLastOpenedFilePathNew();
+        File tempFile = FileManager.getLastOpenedFilePath();
 
         String content = "";
         try {content = FileManager.readFileToString(tempFile);}
@@ -33,14 +30,6 @@ public class TextEditor extends JPanel {
 
         textArea.setText(content);
 
-
-        undoManager = new UndoManager();
-        textArea.getDocument().addUndoableEditListener(new UndoableEditListener() {
-            @Override
-            public void undoableEditHappened(UndoableEditEvent e) {
-                undoManager.addEdit(e.getEdit());
-            }
-        });
         add(new JScrollPane(textArea), BorderLayout.CENTER);
     }
 
@@ -48,16 +37,13 @@ public class TextEditor extends JPanel {
         return textArea;
     }
 
-    public UndoManager getUndoManager() {
-        return undoManager;
-    }
 
     public void saveFile() throws IOException {
-        File tempFile = FileManager.getLastOpenedFilePathNew();
+        File tempFile = FileManager.getLastOpenedFilePath();
         FileWriter fileWriter = new FileWriter(tempFile, false);
         fileWriter.write(textArea.getText());
         fileWriter.close();
-        System.out.println(FileManager.getLastOpenedFilePathNew() + "saved!");
+        System.out.println(FileManager.getLastOpenedFilePath() + "saved!");
     }
 
     public void insertAtCursor(RSyntaxTextArea textField, String text) {

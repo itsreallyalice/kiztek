@@ -1,7 +1,7 @@
 import javax.swing.*;
 import java.io.*;
 
-import java.util.ResourceBundle;
+import java.util.List;
 import java.util.prefs.Preferences;
 
 public class FileManager {
@@ -13,7 +13,8 @@ public class FileManager {
     //public static Preferences preferences;
 
 
-    public static File createMainTeX(String name, String path){
+
+    public static File createTeXFile(String name, String path){
         String content = "\\documentclass{article}\n\n"
                 + "\\begin{document}\n\n"
                 + "(Type your content here.)\n\n"
@@ -21,7 +22,6 @@ public class FileManager {
 
         File newFile;
         String baseFilename = JOptionPane.showInputDialog(null,"New File",name);
-
 
         try {
 
@@ -45,8 +45,11 @@ public class FileManager {
     }
 
 
-    public  static File getLastOpenedFilePathNew() {
+
+
+    public  static File getLastOpenedFilePath() {
         Preferences preferences = Preferences.userRoot().node(FileManager.class.getName());
+
         return new File (preferences.get(LAST_OPENED_FILE_KEY,"")) ;
     }
 
@@ -90,8 +93,6 @@ public class FileManager {
         // Extract the filename without extension and the extension itself
         String fileNameWithoutExtension = baseName.substring(0, baseName.lastIndexOf('.'));
         String extension = baseName.substring(baseName.lastIndexOf('.'));
-
-
 
         // Loop to find a unique file name
         while (file.exists()) {

@@ -40,10 +40,7 @@ public class Main extends JFrame implements ErrorListener {
 
 
         FlatLightLaf.setup();
-
         UIManager.setLookAndFeel(new FlatLightLaf());
-
-
 
         setTitle("KiZTeK: The best LaTeX compiler!");
         ImageIcon logo = new ImageIcon(getClass().getResource("logo.png"));
@@ -51,7 +48,6 @@ public class Main extends JFrame implements ErrorListener {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setLocationRelativeTo(null);
-
 
         textEditorPanel = new TextEditor();
         pdfViewerPanel = new PDFViewer();
@@ -63,9 +59,9 @@ public class Main extends JFrame implements ErrorListener {
 
         setLayout(new BorderLayout());
         JPanel centerPanel = new JPanel(new GridLayout(1, 2));
+
         centerPanel.add(textEditorPanel);
         centerPanel.add(pdfViewerPanel);
-
 
         add(toolbarPanel, BorderLayout.NORTH);
         add(centerPanel, BorderLayout.CENTER);
@@ -76,7 +72,6 @@ public class Main extends JFrame implements ErrorListener {
             @Override
             public void windowClosing(WindowEvent e) {
                 super.windowClosing(e);
-
 
 
             }

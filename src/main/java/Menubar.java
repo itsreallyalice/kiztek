@@ -25,7 +25,6 @@ public class Menubar extends JMenuBar implements ActionListener {
         fileMenu.add(openMI);
         fileMenu.add(saveMI);
 
-
         JMenu editMenu = new JMenu("Edit");
 
         editMenu.add(createMenuItem(RTextArea.getAction(RTextArea.UNDO_ACTION)));
@@ -38,35 +37,8 @@ public class Menubar extends JMenuBar implements ActionListener {
         editMenu.addSeparator();
         editMenu.add(createMenuItem(RTextArea.getAction(RTextArea.SELECT_ALL_ACTION)));
 
-
-
-
-//        JMenuItem undoMI = new JMenuItem("Undo");
-//        JMenuItem redoMI = new JMenuItem("Redo");
-//        JMenuItem cutMI = new JMenuItem("Cut");
-//        JMenuItem copyMI = new JMenuItem("Copy");
-//        JMenuItem pasteMI = new JMenuItem("Paste");
-//        undoMI.addActionListener(this);
-//        redoMI.addActionListener(this);
-//        cutMI.addActionListener(this);
-//        copyMI.addActionListener(this);
-//        pasteMI.addActionListener(this);
-//        editMenu.add(undoMI);
-//        editMenu.add(redoMI);
-//        editMenu.add(cutMI);
-//        editMenu.add(copyMI);
-//        editMenu.add(pasteMI);
-
-
-
         add(fileMenu);
         add(editMenu);
-
-
-
-
-
-
 
     }
 
@@ -78,6 +50,7 @@ public class Menubar extends JMenuBar implements ActionListener {
             case "Save":
                 try {
                     textEditorPanel.saveFile();
+                    //textEditorPanel.saveFile();
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
@@ -108,7 +81,7 @@ public class Menubar extends JMenuBar implements ActionListener {
                 if (newFileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
                     File dir = newFileChooser.getSelectedFile();
                     File file;
-                    file = FileManager.createMainTeX("main.tex",dir.getAbsolutePath());
+                    file = FileManager.createTeXFile("main.tex",dir.getAbsolutePath());
                     try {
                         FileManager.saveLastOpenedFilePath(file.getAbsolutePath());
                     } catch (IOException ex) {

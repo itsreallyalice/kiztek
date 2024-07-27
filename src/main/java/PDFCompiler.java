@@ -13,6 +13,15 @@ public class PDFCompiler {
     public void setErrorListener(ErrorListener errorListener) {
         this.errorListener = errorListener;
     }
+
+
+
+
+
+
+
+
+
     public static File compilepdflatexbibtexpdflatex(File latexDocument) throws TransformerException {
         String line;
         StringBuilder outputMsg = new StringBuilder();
@@ -91,14 +100,13 @@ public class PDFCompiler {
             process.waitFor();
             errorGenerator(outputMsg.toString());
             int exitCode = process.exitValue();
-            if (exitCode == 0) {
+            File pdfFile = new File(latexDocument.getParent(), latexDocument.getName().replace(".tex", ".pdf"));
+            System.err.println("Compilation failed with exit code: " + exitCode);
+            return pdfFile;
 
-                File pdfFile = new File(latexDocument.getParent(), latexDocument.getName().replace(".tex", ".pdf"));
-                return pdfFile;
-            } else {
 
-                System.err.println("Compilation failed with exit code: " + exitCode);
-            }
+
+
         } catch (IOException | InterruptedException e) {
 
             if (errorListener != null) {
@@ -139,13 +147,15 @@ public class PDFCompiler {
 
 
 
-            if (exitCode == 0) {
 
-                File pdfFile = new File(latexDocument.getParent(), latexDocument.getName().replace(".tex", ".pdf"));
-                return pdfFile;
-            } else {
-                System.err.println("Compilation failed with exit code: " + exitCode);
-            }
+
+
+            File pdfFile = new File(latexDocument.getParent(), latexDocument.getName().replace(".tex", ".pdf"));
+            System.err.println("Compilation failed with exit code: " + exitCode);
+            return pdfFile;
+
+
+
 
         }catch (IOException | InterruptedException e) {
 
@@ -155,15 +165,14 @@ public class PDFCompiler {
         }
         return null;}
 
-
     public static File compilebibtex(File latexDocument) throws TransformerException {
         String line;
         StringBuilder outputMsg = new StringBuilder();
         try {
-            File tempFile = File.createTempFile("tempLatex", ".tex");
-            tempFile.deleteOnExit();
+
 
             String latexName =  FilenameUtils.removeExtension(latexDocument.getName());
+            System.out.println(latexName);
             ProcessBuilder bibtexProcessBuilder = new ProcessBuilder("bibtex", "-interaction=nonstopmode",latexName).directory(latexDocument.getParentFile());
             bibtexProcessBuilder.redirectErrorStream(true);
             Process latexProcess = bibtexProcessBuilder.start();
@@ -182,13 +191,13 @@ public class PDFCompiler {
             latexProcess.waitFor();
             errorGenerator(outputMsg.toString());
             int exitCode = latexProcess.exitValue();
-            if (exitCode == 0) {
 
+            System.err.println("Compilation failed with exit code: " + exitCode);
                 File pdfFile = new File(latexDocument.getParent(), latexDocument.getName().replace(".tex", ".pdf"));
                 return pdfFile;
-            } else {
-                System.err.println("Compilation failed with exit code: " + exitCode);
-            }
+
+
+
         }catch (IOException | InterruptedException e) {
 
             if (errorListener != null) {
@@ -223,13 +232,13 @@ public class PDFCompiler {
             latexProcess.waitFor();
             errorGenerator(outputMsg.toString());
             int exitCode = latexProcess.exitValue();
-            if (exitCode == 0) {
 
+            System.err.println("Compilation failed with exit code: " + exitCode);
                 File pdfFile = new File(latexDocument.getParent(), latexDocument.getName().replace(".tex", ".pdf"));
                 return pdfFile;
-            } else {
-                System.err.println("Compilation failed with exit code: " + exitCode);
-            }
+
+
+
         }catch (IOException | InterruptedException e) {
 
             if (errorListener != null) {
@@ -264,13 +273,13 @@ public class PDFCompiler {
             latexProcess.waitFor();
             errorGenerator(outputMsg.toString());
             int exitCode = latexProcess.exitValue();
-            if (exitCode == 0) {
 
+            System.err.println("Compilation failed with exit code: " + exitCode);
                 File pdfFile = new File(latexDocument.getParent(), latexDocument.getName().replace(".tex", ".pdf"));
                 return pdfFile;
-            } else {
-                System.err.println("Compilation failed with exit code: " + exitCode);
-            }
+
+
+
         }catch (IOException | InterruptedException e) {
 
             if (errorListener != null) {
@@ -286,6 +295,7 @@ public class PDFCompiler {
         try (BufferedReader br = new BufferedReader(new StringReader(output))) {
             String line;
             while ((line = br.readLine()) != null) {
+                //LaTeX errors can only start with these characters
                 if (line.startsWith("?") || line.startsWith("!") || line.startsWith("LaTeX Warning") || line.startsWith("l.")) {
                     errorLines.add(line);
                 }
@@ -293,7 +303,6 @@ public class PDFCompiler {
         } catch (IOException e) {
             System.out.println("Error message invalid");
         }
-
         // Display the lines in a dialog box
         if (!errorLines.isEmpty()) {
             StringBuilder message = new StringBuilder();
@@ -302,10 +311,8 @@ public class PDFCompiler {
             }
             JOptionPane.showMessageDialog(null, message.toString(), "Errors/Warnings", JOptionPane.ERROR_MESSAGE);
         } else {
-            //JOptionPane.showMessageDialog(null, "No errors found.", "Errors", JOptionPane.INFORMATION_MESSAGE);
+            //No errors
         }
-
-
     }
 
 
