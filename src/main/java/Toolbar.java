@@ -195,20 +195,11 @@ public class Toolbar extends JToolBar implements ActionListener   {
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
-                PDFCompiler compiler = new PDFCompiler();
-                compiler.setErrorListener(mainFrame);
 
                 switch (FileManager.getCompilerKey()) {
                     case "pdflatex+bibtex+pdflatex":
-                        try {
-                            mainFrame.getPdfViewerPanel().getController().openDocument(
-                                    PDFCompiler.compilepdflatexbibtexpdflatex(new File(FileManager.getMainTexFile())).getPath());
-                        } catch (TransformerException ex) {
-                            System.out.println("error time");
-
-                            throw new RuntimeException(ex);
-
-                        }
+                        mainFrame.getPdfViewerPanel().getController().openDocument(
+                                PDFCompiler.compilepdflatexbibtexpdflatex(new File(FileManager.getMainTexFile())).getPath());
                         break;
                     case "pdflatex":
                         try {

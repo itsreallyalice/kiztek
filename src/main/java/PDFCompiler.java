@@ -22,7 +22,7 @@ public class PDFCompiler {
 
 
 
-    public static File compilepdflatexbibtexpdflatex(File latexDocument) throws TransformerException {
+    public static File compilepdflatexbibtexpdflatex(File latexDocument)  {
         String line;
         StringBuilder outputMsg = new StringBuilder();
         try {
@@ -110,7 +110,7 @@ public class PDFCompiler {
         } catch (IOException | InterruptedException e) {
 
             if (errorListener != null) {
-                errorListener.error((TransformerException) e);
+                //errorListener.error((TransformerException) e);
             }
 //            showErrorDialog(e.getMessage())
         }
