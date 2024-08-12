@@ -17,7 +17,7 @@ KiZTeK is a user-friendly, offline LaTeX editor designed to simplify the process
 
 ## Installation
 
-To set up KiZTeK locally, follow these steps:
+To set up KiZTeK locally, please ensure you have a LaTeX installation (Tex Live reccomended) and follow these steps:
 
 1. **Clone the Repository:**
     ```bash
